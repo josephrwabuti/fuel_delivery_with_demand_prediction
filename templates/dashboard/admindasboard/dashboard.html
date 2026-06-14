@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/adminsidebar.html' with active='dashboard' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Admin Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'admin_orders' %}" class="topbar-btn" title="Pending Orders">
+      <i class="fas fa-bell"></i><span class="tb-dot"></span>
+    </a>
+    <a href="{% url 'admin_settings' %}" class="topbar-btn" title="Settings">
+      <i class="fas fa-gear"></i>
+    </a>
+    <a href="{% url 'admin_settings' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"A" }}{{ request.user.last_name.0|default:"D" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Admin" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Welcome line -->
+  <div style="margin-bottom:24px">
+    <h2 style="font-family:var(--font-display);font-size:1.6rem;letter-spacing:0.05em;color:var(--text);margin-bottom:4px">
+      Welcome back, {{ request.user.first_name|default:"Admin" }}
+    </h2>
+    <p style="font-size:0.84rem;color:var(--text-muted)">
+      Here's what's happening across FuelFlow today — {{ today|date:"l, M d Y"|default:"Thursday, Jun 04 2026" }}
+    </p>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stats-grid mb-24">
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Total Orders</span><div class="sc-icon orange"><i class="fas fa-box-open"></i></div></div>
+      <div class="sc-value">{{ total_orders|default:"1,284" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 48 this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Pending Orders</span><div class="sc-icon yellow"><i class="fas fa-clock"></i></div></div>
+      <div class="sc-value">{{ pending_orders|default:"23" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> 5 unassigned</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Active Customers</span><div class="sc-icon blue"><i class="fas fa-users"></i></div></div>
+      <div class="sc-value">{{ total_customers|default:"512" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 14 this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Active Drivers</span><div class="sc-icon green"><i class="fas fa-truck-fast"></i></div></div>
+      <div class="sc-value">{{ total_drivers|default:"18" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> 11 online now</div>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="row-7_5 mb-24">
+
+    <!-- Recent Orders Table -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Orders</span>
+          <a href="{% url 'admin_orders' %}" class="btn btn-ghost btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Driver</th>
+                <th>Fuel / Qty</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if recent_orders %}
+                {% for o in recent_orders %}
+                <tr>
+                  <td><span class="row-id">#{{ o.id }}</span></td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar blue">{{ o.customer.first_name.0 }}{{ o.customer.last_name.0 }}</div>
+                      <span>{{ o.customer.get_full_name }}</span>
+                    </div>
+                  </td>
+                  <td class="text-sm text-muted">{{ o.driver.get_full_name|default:"—" }}</td>
+                  <td>{{ o.fuel_type }} {{ o.quantity }}L</td>
+                  <td class="text-sm text-muted">{{ o.created_at|date:"M d" }}</td>
+                  <td><span class="badge badge-{{ o.status|lower|slugify }}"><i class="fas fa-circle"></i>{{ o.status }}</span></td>
+                </tr>
+                {% endfor %}
+              {% else %}
+              <!-- Demo rows -->
+              <tr>
+                <td><span class="row-id">#FF-2048</span></td>
+                <td><div class="user-cell"><div class="user-avatar blue">HK</div><span>Harbour Logistics</span></div></td>
+                <td class="text-sm text-muted">—</td>
+                <td>Kerosene 80L</td>
+                <td class="text-sm text-muted">Jun 4</td>
+                <td><span class="badge badge-pending"><i class="fas fa-circle"></i>Pending</span></td>
+              </tr>
+              <tr>
+                <td><span class="row-id">#FF-2047</span></td>
+                <td><div class="user-cell"><div class="user-avatar green">MW</div><span>Marcus Webb</span></div></td>
+                <td class="text-sm text-muted">Carlos R.</td>
+                <td>Bio-Fuel 150L</td>
+                <td class="text-sm text-muted">Jun 4</td>
+                <td><span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span></td>
+              </tr>
+              <tr>
+                <td><span class="row-id">#FF-2046</span></td>
+                <td><div class="user-cell"><div class="user-avatar orange">AP</div><span>Anna Peters</span></div></td>
+                <td class="text-sm text-muted">James K.</td>
+                <td>Petrol 100L</td>
+                <td class="text-sm text-muted">Jun 3</td>
+                <td><span class="badge badge-processing"><i class="fas fa-circle"></i>Processing</span></td>
+              </tr>
+              <tr>
+                <td><span class="row-id">#FF-2045</span></td>
+                <td><div class="user-cell"><div class="user-avatar blue">RO</div><span>Robert Osei</span></div></td>
+                <td class="text-sm text-muted">Carlos R.</td>
+                <td>Diesel 300L</td>
+                <td class="text-sm text-muted">Jun 3</td>
+                <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
+              </tr>
+              <tr>
+                <td><span class="row-id">#FF-2044</span></td>
+                <td><div class="user-cell"><div class="user-avatar purple">SK</div><span>Sarah Kim</span></div></td>
+                <td class="text-sm text-muted">—</td>
+                <td>Petrol 100L</td>
+                <td class="text-sm text-muted">Jun 3</td>
+                <td><span class="badge badge-cancelled"><i class="fas fa-circle"></i>Cancelled</span></td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right side widgets -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Order status ring -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Order Breakdown</span></div>
+        <div class="card-body">
+          <!-- SVG donut chart -->
+          <div class="donut-wrap">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <circle cx="65" cy="65" r="52" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="18"/>
+              <!-- Delivered: 68% -->
+              <circle cx="65" cy="65" r="52" fill="none" stroke="#22c55e" stroke-width="18"
+                stroke-dasharray="221 326" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 65 65)" id="donutDelivered"/>
+              <!-- En Route: 12% -->
+              <circle cx="65" cy="65" r="52" fill="none" stroke="#e85d04" stroke-width="18"
+                stroke-dasharray="39 326" stroke-dashoffset="-221" stroke-linecap="round"
+                transform="rotate(-90 65 65)"/>
+              <!-- Pending: 13% -->
+              <circle cx="65" cy="65" r="52" fill="none" stroke="#f4a926" stroke-width="18"
+                stroke-dasharray="42 326" stroke-dashoffset="-260" stroke-linecap="round"
+                transform="rotate(-90 65 65)"/>
+              <!-- Cancelled: 7% -->
+              <circle cx="65" cy="65" r="52" fill="none" stroke="#ef4444" stroke-width="18"
+                stroke-dasharray="23 326" stroke-dashoffset="-302" stroke-linecap="round"
+                transform="rotate(-90 65 65)"/>
+              <text x="65" y="60" text-anchor="middle" fill="white" font-family="'Bebas Neue'" font-size="22" letter-spacing="1">{{ total_orders|default:"1,284" }}</text>
+              <text x="65" y="76" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="9" font-family="Outfit">TOTAL</text>
+            </svg>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-row"><div class="dl-dot" style="background:#22c55e"></div><span class="dl-label">Delivered</span><span class="dl-val">{{ delivered_orders|default:"873" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#e85d04"></div><span class="dl-label">En Route</span><span class="dl-val">{{ enroute_orders|default:"154" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#f4a926"></div><span class="dl-label">Pending</span><span class="dl-val">{{ pending_orders|default:"168" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#ef4444"></div><span class="dl-label">Cancelled</span><span class="dl-val">{{ cancelled_orders|default:"89" }}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Quick Actions</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 22px">
+          <a href="{% url 'admin_drivers' %}#add" class="btn btn-admin w-100" style="justify-content:center">
+            <i class="fas fa-user-plus"></i> Add New Driver
+          </a>
+          <a href="{% url 'admin_orders' %}?filter=pending" class="btn btn-warning w-100" style="justify-content:center">
+            <i class="fas fa-clock"></i> Assign Pending Orders
+          </a>
+          <a href="{% url 'admin_reports' %}" class="btn btn-ghost w-100" style="justify-content:center">
+            <i class="fas fa-chart-bar"></i> View Full Reports
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom row: top drivers + recent customers -->
+  <div class="row-2col">
+
+    <!-- Top performing drivers -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Top Drivers – This Month</span>
+        <a href="{% url 'admin_drivers' %}" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <div class="card-body" style="padding:12px 22px">
+        {% for driver in top_drivers|default:"" %}
+        {% empty %}
+        {% for d in "Carlos Rivera,48,96%|James Kimani,41,98%|Priya Nair,37,94%|Tom Okafor,33,97%"|split:"|" %}
+        {% with p=d|split:',' %}
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div class="user-avatar green" style="width:36px;height:36px;font-size:0.72rem">
+            {{ p.0|slice:":1" }}{{ p.0|slice:"p.0|wordcount:1+1:p.0|wordcount:1+2" }}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text)">{{ p.0 }}</div>
+            <div style="font-size:0.74rem;color:var(--text-muted)">{{ p.1 }} deliveries · {{ p.2 }} on-time</div>
+          </div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">{{ p.1 }}</div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+        <!-- Static fallback always shown -->
+        {% endfor %}
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div class="user-avatar green" style="width:36px;height:36px;font-size:0.72rem">CR</div>
+          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">Carlos Rivera</div><div style="font-size:0.74rem;color:var(--text-muted)">48 deliveries · 96% on-time</div></div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">48</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div class="user-avatar blue" style="width:36px;height:36px;font-size:0.72rem">JK</div>
+          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">James Kimani</div><div style="font-size:0.74rem;color:var(--text-muted)">41 deliveries · 98% on-time</div></div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">41</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div class="user-avatar purple" style="width:36px;height:36px;font-size:0.72rem">PN</div>
+          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">Priya Nair</div><div style="font-size:0.74rem;color:var(--text-muted)">37 deliveries · 94% on-time</div></div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">37</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+          <div class="user-avatar orange" style="width:36px;height:36px;font-size:0.72rem">TO</div>
+          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">Tom Okafor</div><div style="font-size:0.74rem;color:var(--text-muted)">33 deliveries · 97% on-time</div></div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">33</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly order trend bars -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Monthly Orders</span>
+        <span class="badge badge-active">{{ current_year|default:"2026" }}</span>
+      </div>
+      <div class="card-body">
+        <div id="monthBars">
+          <div class="report-bar-row"><span class="rbl">Jan</span><div class="rb-track"><div class="rb-fill" data-w="55"></div></div><span class="rbv">182</span></div>
+          <div class="report-bar-row"><span class="rbl">Feb</span><div class="rb-track"><div class="rb-fill" data-w="62"></div></div><span class="rbv">205</span></div>
+          <div class="report-bar-row"><span class="rbl">Mar</span><div class="rb-track"><div class="rb-fill" data-w="78"></div></div><span class="rbv">258</span></div>
+          <div class="report-bar-row"><span class="rbl">Apr</span><div class="rb-track"><div class="rb-fill" data-w="70"></div></div><span class="rbv">231</span></div>
+          <div class="report-bar-row"><span class="rbl">May</span><div class="rb-track"><div class="rb-fill" data-w="88"></div></div><span class="rbv">291</span></div>
+          <div class="report-bar-row"><span class="rbl">Jun</span><div class="rb-track"><div class="rb-fill" data-w="35"></div></div><span class="rbv">117</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/admin.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Settings</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/adminsidebar.html' with active='settings' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Settings</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'admin_settings' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"A" }}{{ request.user.last_name.0|default:"D" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Admin" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Settings Tab Nav -->
+  <div style="display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0;flex-wrap:wrap">
+    <button class="settings-tab active" data-tab="profile" onclick="switchTab('profile',this)">
+      <i class="fas fa-user"></i> My Account
+    </button>
+    <button class="settings-tab" data-tab="system" onclick="switchTab('system',this)">
+      <i class="fas fa-gear"></i> System
+    </button>
+    <button class="settings-tab" data-tab="notifications" onclick="switchTab('notifications',this)">
+      <i class="fas fa-bell"></i> Notifications
+    </button>
+    <button class="settings-tab" data-tab="pricing" onclick="switchTab('pricing',this)">
+      <i class="fas fa-tag"></i> Fuel Pricing
+    </button>
+    <button class="settings-tab" data-tab="security" onclick="switchTab('security',this)">
+      <i class="fas fa-shield-halved"></i> Security
+    </button>
+  </div>
+
+  <!-- TAB: MY ACCOUNT -->
+  <div class="tab-panel active" id="tab-profile">
+    <!-- Profile Hero -->
+    <div style="background:linear-gradient(135deg,var(--dark3),var(--dark2));border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(139,92,246,0.1),transparent);border-radius:50%;pointer-events:none"></div>
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--admin),var(--admin-dark));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:2rem;color:white;flex-shrink:0;border:3px solid rgba(139,92,246,0.35);box-shadow:0 8px 24px rgba(139,92,246,0.3);position:relative;z-index:1">
+        {{ request.user.first_name.0|default:"A" }}{{ request.user.last_name.0|default:"D" }}
+      </div>
+      <div style="position:relative;z-index:1">
+        <div style="font-family:var(--font-display);font-size:1.8rem;letter-spacing:0.05em;color:var(--white)">
+          {{ request.user.get_full_name|default:"System Administrator" }}
+        </div>
+        <div style="font-size:0.83rem;color:var(--text-muted);margin:4px 0 10px">
+          {{ request.user.email|default:"admin@fuelflow.io" }}
+        </div>
+        <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);border-radius:20px;padding:4px 14px;font-size:0.75rem;color:var(--admin);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">
+          <i class="fas fa-shield-halved" style="font-size:0.65rem"></i> Administrator
+        </span>
+      </div>
+    </div>
+
+    <div class="row-2col" style="gap:20px;align-items:start">
+      <!-- Edit profile form -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Personal Information</span></div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'admin_update_profile' %}">
+            {% csrf_token %}
+            <div class="form-2col">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-input" value="{{ request.user.first_name|default:'System' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-input" value="{{ request.user.last_name|default:'Admin' }}"/>
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input" value="{{ request.user.email|default:'admin@fuelflow.io' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="phone" class="form-input" value="{{ admin_profile.phone|default:'+1 800 000 0001' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Timezone</label>
+                <select name="timezone" class="form-select-lg">
+                  <option selected>UTC – 00:00</option>
+                  <option>EST – UTC-5</option>
+                  <option>PST – UTC-8</option>
+                  <option>WAT – UTC+1</option>
+                  <option>EAT – UTC+3</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:16px">
+              <button type="submit" class="btn btn-admin"><i class="fas fa-check"></i> Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Change password -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Change Password</span></div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'change_password' %}" id="adminPwForm">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Current Password</label>
+              <input type="password" name="current_password" class="form-input" placeholder="••••••••"/>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">New Password</label>
+              <input type="password" name="new_password" class="form-input" placeholder="••••••••" id="adminNewPw"/>
+            </div>
+            <div class="form-group" style="margin-bottom:20px">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-input" placeholder="••••••••" id="adminConfPw"/>
+            </div>
+            <div style="display:flex;justify-content:flex-end">
+              <button type="submit" class="btn btn-admin"><i class="fas fa-lock"></i> Update Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SYSTEM -->
+  <div class="tab-panel" id="tab-system">
+    <div class="row-2col" style="gap:20px;align-items:start">
+      <div class="card">
+        <div class="card-header"><span class="card-title">General Settings</span></div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'admin_save_settings' %}">
+            {% csrf_token %}
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <input type="text" name="company_name" class="form-input" value="{{ settings.company_name|default:'FuelFlow Inc.' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Support Email</label>
+                <input type="email" name="support_email" class="form-input" value="{{ settings.support_email|default:'support@fuelflow.io' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Support Phone</label>
+                <input type="tel" name="support_phone" class="form-input" value="{{ settings.support_phone|default:'+1 800 FUEL NOW' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Default Delivery Radius (km)</label>
+                <input type="number" name="delivery_radius" class="form-input" value="{{ settings.delivery_radius|default:'25' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Min. Order Quantity (Litres)</label>
+                <input type="number" name="min_order_qty" class="form-input" value="{{ settings.min_order_qty|default:'20' }}"/>
+              </div>
+              <div style="display:flex;justify-content:flex-end">
+                <button type="submit" class="btn btn-admin"><i class="fas fa-check"></i> Save Settings</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">System Toggles</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+          {% for lbl, desc, checked in "Online Ordering,Allow customers to place new orders,1|AI Auto-Scheduling,Let AI auto-assign drivers to orders,1|Driver Self-Assignment,Allow drivers to accept orders themselves,1|Customer Registration,Allow new customer signups,1|Maintenance Mode,Disable all non-admin access,0"|split:"|" %}
+          {% with p=lbl.split:',' %}
+          <!-- static fallback below -->
+          {% endwith %}
+          {% endfor %}
+          <!-- Static toggles always shown -->
+          {% for item in "Online Ordering,Allow customers to place new orders,1|AI Auto-Scheduling,Let AI auto-assign drivers to orders,1|Driver Self-Assignment,Allow drivers to accept orders themselves,1|Customer Registration,Allow new customer signups,1|Maintenance Mode,Disable all non-admin access,0"|split:"|" %}
+          {% with p=item|split:',' %}
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;color:var(--text)">{{ p.0 }}</div>
+              <div style="font-size:0.76rem;color:var(--text-muted)">{{ p.1 }}</div>
+            </div>
+            <label class="toggle-switch" style="flex-shrink:0">
+              <input type="checkbox" {% if p.2 == '1' %}checked{% endif %}/>
+              <span class="ts-track"></span>
+            </label>
+          </div>
+          {% endwith %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: NOTIFICATIONS -->
+  <div class="tab-panel" id="tab-notifications">
+    <div class="card" style="max-width:600px">
+      <div class="card-header"><span class="card-title">Notification Preferences</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+        {% for item in "New order placed,Get notified when a customer places an order,1|Order delivered,Confirm when a delivery is completed,1|Driver goes offline,Alert when a driver changes status to offline,0|New customer signup,Notify when a new customer registers,1|Order cancelled,Alert when an order is cancelled,1|Low driver availability,Warn when fewer than 3 drivers are online,1"|split:"|" %}
+        {% with p=item|split:',' %}
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div>
+            <div style="font-size:0.88rem;font-weight:600;color:var(--text)">{{ p.0 }}</div>
+            <div style="font-size:0.76rem;color:var(--text-muted)">{{ p.1 }}</div>
+          </div>
+          <label class="toggle-switch" style="flex-shrink:0">
+            <input type="checkbox" {% if p.2 == '1' %}checked{% endif %}/>
+            <span class="ts-track"></span>
+          </label>
+        </div>
+        {% endwith %}
+        {% endfor %}
+        <div style="display:flex;justify-content:flex-end;margin-top:4px">
+          <button class="btn btn-admin" onclick="showDashToast('Notification preferences saved!','fa-check-circle','var(--success)')">
+            <i class="fas fa-check"></i> Save Preferences
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: FUEL PRICING -->
+  <div class="tab-panel" id="tab-pricing">
+    <div class="card" style="max-width:600px">
+      <div class="card-header">
+        <span class="card-title">Fuel Price Management</span>
+        <span class="badge badge-admin">Live Prices</span>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{% url 'admin_save_pricing' %}">
+          {% csrf_token %}
+          <div style="display:flex;flex-direction:column;gap:16px">
+            {% for item in "Petrol,fire-flame-curved,1.42|Diesel,oil-can,1.38|Kerosene,flask,1.15|Bio-Fuel,leaf,1.55"|split:"|" %}
+            {% with p=item|split:',' %}
+            <div style="display:flex;align-items:center;gap:14px;background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">
+              <div style="width:38px;height:38px;background:rgba(232,93,4,0.12);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0">
+                <i class="fas fa-{{ p.1 }}"></i>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:2px">{{ p.0 }}</div>
+                <div style="font-size:0.74rem;color:var(--text-muted)">Price per litre</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:0.9rem;color:var(--text-muted)">$</span>
+                <input type="number" name="price_{{ p.0|lower }}" step="0.01" min="0"
+                  class="form-input" style="width:90px;text-align:right"
+                  value="{{ p.2 }}"/>
+                <span style="font-size:0.78rem;color:var(--text-muted)">/L</span>
+              </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+            <!-- Delivery fee -->
+            <div style="display:flex;align-items:center;gap:14px;background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">
+              <div style="width:38px;height:38px;background:rgba(139,92,246,0.12);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--admin);flex-shrink:0">
+                <i class="fas fa-truck-fast"></i>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:2px">Delivery Fee</div>
+                <div style="font-size:0.74rem;color:var(--text-muted)">Flat fee per order</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:0.9rem;color:var(--text-muted)">$</span>
+                <input type="number" name="delivery_fee" step="0.01" min="0"
+                  class="form-input" style="width:90px;text-align:right" value="0.00"/>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px">
+              <button type="submit" class="btn btn-admin"><i class="fas fa-check"></i> Update Prices</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SECURITY -->
+  <div class="tab-panel" id="tab-security">
+    <div class="row-2col" style="gap:20px;align-items:start">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Login & Access</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+          {% for item in "Two-Factor Authentication,Require 2FA for all admin logins,0|Session Timeout,Auto-logout after 30 minutes of inactivity,1|Login Alerts,Email alert on new admin login,1|Force Password Reset,Require all users to reset password,0"|split:"|" %}
+          {% with p=item|split:',' %}
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;color:var(--text)">{{ p.0 }}</div>
+              <div style="font-size:0.76rem;color:var(--text-muted)">{{ p.1 }}</div>
+            </div>
+            <label class="toggle-switch" style="flex-shrink:0">
+              <input type="checkbox" {% if p.2 == '1' %}checked{% endif %}/>
+              <span class="ts-track"></span>
+            </label>
+          </div>
+          {% endwith %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(239,68,68,0.12)">
+        <div class="card-header" style="border-color:rgba(239,68,68,0.08)">
+          <span class="card-title" style="color:var(--danger)">
+            <i class="fas fa-triangle-exclamation" style="margin-right:8px"></i>Danger Zone
+          </span>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+          <p class="text-sm text-muted" style="margin-bottom:4px">These actions affect the entire system. Use with extreme caution.</p>
+          <button class="btn btn-warning w-100" style="justify-content:center"
+            onclick="if(confirm('Clear all sessions? All users will be logged out.')) showDashToast('All sessions cleared','fa-check-circle','var(--warning)')">
+            <i class="fas fa-rotate"></i> Clear All User Sessions
+          </button>
+          <button class="btn w-100" style="justify-content:center;background:rgba(239,68,68,0.06);color:var(--danger);border:1.5px solid rgba(239,68,68,0.2)"
+            onclick="if(confirm('Purge cancelled orders? This cannot be undone.')) showDashToast('Cancelled orders purged','fa-trash','var(--danger)')">
+            <i class="fas fa-trash"></i> Purge Cancelled Orders
+          </button>
+          <a href="{% url 'logout' %}" class="btn btn-danger w-100" style="justify-content:center">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Toggle switch + settings tab CSS -->
+<style>
+.toggle-switch { position:relative;display:inline-block;width:42px;height:24px; }
+.toggle-switch input { opacity:0;width:0;height:0; }
+.ts-track { position:absolute;inset:0;background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.3s; }
+.ts-track::before { content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;background:var(--text-muted);border-radius:50%;transition:all 0.3s; }
+.toggle-switch input:checked + .ts-track { background:var(--admin);border-color:var(--admin); }
+.toggle-switch input:checked + .ts-track::before { transform:translateX(18px);background:white; }
+
+.settings-tab {
+  padding:10px 18px;border:none;background:none;
+  color:var(--text-muted);font-family:var(--font-body);
+  font-size:0.85rem;font-weight:600;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all var(--transition);
+  display:inline-flex;align-items:center;gap:7px;
+  margin-bottom:-1px;
+}
+.settings-tab:hover { color:var(--text); }
+.settings-tab.active { color:var(--admin); border-bottom-color:var(--admin); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+</style>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/admin.js' %}"></script>
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+  document.getElementById('adminPwForm')?.addEventListener('submit', function(e) {
+    if (document.getElementById('adminNewPw').value !== document.getElementById('adminConfPw').value) {
+      e.preventDefault();
+      showDashToast('Passwords do not match', 'fa-exclamation-circle', 'var(--danger)');
+    }
+  });
+</script>
+</body>
+</html>

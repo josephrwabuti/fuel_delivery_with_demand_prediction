@@ -1,0 +1,282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Reports</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/adminsidebar.html' with active='reports' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Reports</span>
+  </div>
+  <div class="topbar-right">
+    <!-- Date range filter -->
+    <select class="filter-select" id="reportPeriod" onchange="updateReportPeriod(this.value)" style="font-size:0.82rem">
+      <option value="month">This Month</option>
+      <option value="quarter">This Quarter</option>
+      <option value="year" selected>This Year</option>
+      <option value="all">All Time</option>
+    </select>
+    <a href="{% url 'admin_settings' %}" class="topbar-profile" style="margin-left:6px">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"A" }}{{ request.user.last_name.0|default:"D" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Admin" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- KPI cards — 5 across -->
+  <div class="stats-grid stats-grid-5 mb-24">
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Total Orders</span><div class="sc-icon orange"><i class="fas fa-box-open"></i></div></div>
+      <div class="sc-value">{{ total_orders|default:"1,284" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 12% vs last year</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Delivered</span><div class="sc-icon green"><i class="fas fa-circle-check"></i></div></div>
+      <div class="sc-value">{{ delivered_orders|default:"873" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> 68% of total</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Pending</span><div class="sc-icon yellow"><i class="fas fa-clock"></i></div></div>
+      <div class="sc-value">{{ pending_orders|default:"168" }}</div>
+      <div class="sc-change down"><i class="fas fa-arrow-down"></i> 5% vs last month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Total Litres</span><div class="sc-icon purple"><i class="fas fa-gas-pump"></i></div></div>
+      <div class="sc-value">{{ total_litres|default:"284K" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 8% vs last year</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Revenue</span><div class="sc-icon blue"><i class="fas fa-dollar-sign"></i></div></div>
+      <div class="sc-value">${{ total_revenue|default:"392K" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 14% vs last year</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Monthly orders + Fuel breakdown -->
+  <div class="row-2col mb-24">
+
+    <!-- Monthly order volumes -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Monthly Order Volume</span>
+        <span class="badge badge-active">{{ current_year|default:"2026" }}</span>
+      </div>
+      <div class="card-body">
+        <div id="monthlyBars">
+          {% for m in monthly_data %}
+          <div class="report-bar-row">
+            <span class="rbl">{{ m.label }}</span>
+            <div class="rb-track"><div class="rb-fill" data-w="{{ m.pct }}"></div></div>
+            <span class="rbv">{{ m.count }}</span>
+          </div>
+          {% empty %}
+          <div class="report-bar-row"><span class="rbl">Jan</span><div class="rb-track"><div class="rb-fill" data-w="55"></div></div><span class="rbv">182</span></div>
+          <div class="report-bar-row"><span class="rbl">Feb</span><div class="rb-track"><div class="rb-fill" data-w="62"></div></div><span class="rbv">205</span></div>
+          <div class="report-bar-row"><span class="rbl">Mar</span><div class="rb-track"><div class="rb-fill" data-w="78"></div></div><span class="rbv">258</span></div>
+          <div class="report-bar-row"><span class="rbl">Apr</span><div class="rb-track"><div class="rb-fill" data-w="70"></div></div><span class="rbv">231</span></div>
+          <div class="report-bar-row"><span class="rbl">May</span><div class="rb-track"><div class="rb-fill" data-w="88"></div></div><span class="rbv">291</span></div>
+          <div class="report-bar-row"><span class="rbl">Jun</span><div class="rb-track"><div class="rb-fill" data-w="35"></div></div><span class="rbv">117</span></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Fuel type breakdown -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">Fuel Type Distribution</span></div>
+      <div class="card-body">
+        <!-- SVG Donut -->
+        <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+          <svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0">
+            <circle cx="65" cy="65" r="52" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="20"/>
+            <!-- Diesel 55% -->
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#3b82f6" stroke-width="20"
+              stroke-dasharray="179 326" stroke-dashoffset="0" transform="rotate(-90 65 65)"/>
+            <!-- Petrol 25% -->
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#e85d04" stroke-width="20"
+              stroke-dasharray="82 326" stroke-dashoffset="-179" transform="rotate(-90 65 65)"/>
+            <!-- Bio-Fuel 12% -->
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#22c55e" stroke-width="20"
+              stroke-dasharray="39 326" stroke-dashoffset="-261" transform="rotate(-90 65 65)"/>
+            <!-- Kerosene 8% -->
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#f4a926" stroke-width="20"
+              stroke-dasharray="26 326" stroke-dashoffset="-300" transform="rotate(-90 65 65)"/>
+            <text x="65" y="61" text-anchor="middle" fill="white" font-family="'Bebas Neue'" font-size="18">284K</text>
+            <text x="65" y="76" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8" font-family="Outfit">LITRES</text>
+          </svg>
+          <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+            <div class="dl-row"><div class="dl-dot" style="background:#3b82f6"></div><span class="dl-label">Diesel</span><span class="dl-val">55% · 156K L</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#e85d04"></div><span class="dl-label">Petrol</span><span class="dl-val">25% · 71K L</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#22c55e"></div><span class="dl-label">Bio-Fuel</span><span class="dl-val">12% · 34K L</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#f4a926"></div><span class="dl-label">Kerosene</span><span class="dl-val">8% · 23K L</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Order status breakdown + Demand by time slot -->
+  <div class="row-2col mb-24">
+
+    <!-- Order status breakdown -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">Order Status Breakdown</span></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          {% for item in status_breakdown %}
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.82rem;color:var(--text)">{{ item.label }}</span>
+              <span style="font-size:0.82rem;color:var(--text-muted)">{{ item.count }} ({{ item.pct }}%)</span>
+            </div>
+            <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:{{ item.pct }}%;background:{{ item.color }};border-radius:4px;transition:width 1.2s ease"></div>
+            </div>
+          </div>
+          {% empty %}
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:.82rem;color:var(--text)">Delivered</span><span style="font-size:.82rem;color:var(--text-muted)">873 (68%)</span></div>
+            <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:68%;background:var(--success);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:.82rem;color:var(--text)">Pending</span><span style="font-size:.82rem;color:var(--text-muted)">168 (13%)</span></div>
+            <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:13%;background:var(--warning);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:.82rem;color:var(--text)">En Route</span><span style="font-size:.82rem;color:var(--text-muted)">154 (12%)</span></div>
+            <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:12%;background:var(--primary);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:.82rem;color:var(--text)">Processing</span><span style="font-size:.82rem;color:var(--text-muted)">89 (7%)</span></div>
+            <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:7%;background:var(--info);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:.82rem;color:var(--text)">Cancelled</span><span style="font-size:.82rem;color:var(--text-muted)">89 (7%)</span></div>
+            <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:7%;background:var(--danger);border-radius:4px"></div></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Demand by time slot (foundation for AI prediction) -->
+    <div class="card" style="border-color:rgba(139,92,246,0.2)">
+      <div class="card-header">
+        <span class="card-title">Demand by Time Slot</span>
+        <span class="badge badge-admin"><i class="fas fa-brain"></i> AI Data</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;line-height:1.5">
+          Order frequency per delivery window — used by the AI demand prediction model to optimise driver scheduling.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:12px" id="timeSlotBars">
+          <div class="report-bar-row">
+            <span class="rbl" style="width:110px;font-size:0.75rem">8AM – 12PM</span>
+            <div class="rb-track"><div class="rb-fill" data-w="100" style="background:linear-gradient(90deg,var(--admin),var(--primary))"></div></div>
+            <span class="rbv">512</span>
+          </div>
+          <div class="report-bar-row">
+            <span class="rbl" style="width:110px;font-size:0.75rem">12PM – 5PM</span>
+            <div class="rb-track"><div class="rb-fill" data-w="72" style="background:linear-gradient(90deg,var(--admin),var(--primary))"></div></div>
+            <span class="rbv">368</span>
+          </div>
+          <div class="report-bar-row">
+            <span class="rbl" style="width:110px;font-size:0.75rem">5PM – 8PM</span>
+            <div class="rb-track"><div class="rb-fill" data-w="44" style="background:linear-gradient(90deg,var(--admin),var(--primary))"></div></div>
+            <span class="rbv">224</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:var(--radius-sm)">
+          <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55">
+            <i class="fas fa-lightbulb" style="color:var(--admin);margin-right:6px"></i>
+            <strong style="color:var(--text)">Peak demand</strong> is in the morning slot (8AM–12PM).
+            Consider assigning more drivers to morning shifts for optimal coverage.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Top customers + Driver performance -->
+  <div class="row-2col">
+
+    <!-- Top customers by order volume -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Top Customers</span>
+        <a href="{% url 'admin_customers' %}" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <div class="card-body" style="padding:12px 22px">
+        <table class="data-table">
+          <thead>
+            <tr><th>Customer</th><th>Orders</th><th>Litres</th><th>Spent</th></tr>
+          </thead>
+          <tbody>
+            {% for c in top_customers %}
+            <tr>
+              <td><div class="user-cell"><div class="user-avatar blue" style="font-size:0.72rem">{{ c.initials }}</div><span class="text-sm">{{ c.name }}</span></div></td>
+              <td style="font-weight:600;color:var(--text)">{{ c.orders }}</td>
+              <td class="text-sm text-muted">{{ c.litres }}L</td>
+              <td style="color:var(--accent);font-weight:600">${{ c.spent }}</td>
+            </tr>
+            {% empty %}
+            <tr><td><div class="user-cell"><div class="user-avatar blue" style="font-size:0.72rem">RO</div><span class="text-sm">Robert Osei</span></div></td><td style="font-weight:600;color:var(--text)">36</td><td class="text-sm text-muted">7,200L</td><td style="color:var(--accent);font-weight:600">$4,120</td></tr>
+            <tr><td><div class="user-cell"><div class="user-avatar green" style="font-size:0.72rem">TW</div><span class="text-sm">Tom Watson</span></div></td><td style="font-weight:600;color:var(--text)">41</td><td class="text-sm text-muted">6,800L</td><td style="color:var(--accent);font-weight:600">$4,890</td></tr>
+            <tr><td><div class="user-cell"><div class="user-avatar orange" style="font-size:0.72rem">JM</div><span class="text-sm">James Mitchell</span></div></td><td style="font-weight:600;color:var(--text)">24</td><td class="text-sm text-muted">4,800L</td><td style="color:var(--accent);font-weight:600">$2,614</td></tr>
+            <tr><td><div class="user-cell"><div class="user-avatar purple" style="font-size:0.72rem">SK</div><span class="text-sm">Sarah Kim</span></div></td><td style="font-weight:600;color:var(--text)">18</td><td class="text-sm text-muted">2,700L</td><td style="color:var(--accent);font-weight:600">$1,980</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Driver performance -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Driver Performance</span>
+        <a href="{% url 'admin_drivers' %}" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <div class="card-body" style="padding:12px 22px">
+        <table class="data-table">
+          <thead>
+            <tr><th>Driver</th><th>Deliveries</th><th>On-Time</th><th>Litres</th></tr>
+          </thead>
+          <tbody>
+            {% for d in driver_performance %}
+            <tr>
+              <td><div class="user-cell"><div class="user-avatar green" style="font-size:0.72rem">{{ d.initials }}</div><span class="text-sm">{{ d.name }}</span></div></td>
+              <td style="font-weight:600;color:var(--text)">{{ d.deliveries }}</td>
+              <td style="color:var(--success);font-weight:700">{{ d.on_time }}%</td>
+              <td class="text-sm text-muted">{{ d.litres }}L</td>
+            </tr>
+            {% empty %}
+            <tr><td><div class="user-cell"><div class="user-avatar green" style="font-size:0.72rem">CR</div><span class="text-sm">Carlos Rivera</span></div></td><td style="font-weight:600;color:var(--text)">148</td><td style="color:var(--success);font-weight:700">96%</td><td class="text-sm text-muted">22,400L</td></tr>
+            <tr><td><div class="user-cell"><div class="user-avatar blue" style="font-size:0.72rem">JK</div><span class="text-sm">James Kimani</span></div></td><td style="font-weight:600;color:var(--text)">122</td><td style="color:var(--success);font-weight:700">98%</td><td class="text-sm text-muted">18,600L</td></tr>
+            <tr><td><div class="user-cell"><div class="user-avatar purple" style="font-size:0.72rem">PN</div><span class="text-sm">Priya Nair</span></div></td><td style="font-weight:600;color:var(--text)">97</td><td style="color:var(--warning);font-weight:700">94%</td><td class="text-sm text-muted">14,200L</td></tr>
+            <tr><td><div class="user-cell"><div class="user-avatar orange" style="font-size:0.72rem">TO</div><span class="text-sm">Tom Okafor</span></div></td><td style="font-weight:600;color:var(--text)">88</td><td style="color:var(--success);font-weight:700">97%</td><td class="text-sm text-muted">12,800L</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/admin.js' %}"></script>
+</body>
+</html>

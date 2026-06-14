@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Manage Customers</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/adminsidebar.html' with active='customers' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Manage Customers</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'admin_settings' %}" class="topbar-btn"><i class="fas fa-gear"></i></a>
+    <a href="{% url 'admin_settings' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"A" }}{{ request.user.last_name.0|default:"D" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Admin" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Stats strip -->
+  <div class="stats-grid mb-24">
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Total Customers</span><div class="sc-icon blue"><i class="fas fa-users"></i></div></div>
+      <div class="sc-value">{{ total_customers|default:"512" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 14 this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Active</span><div class="sc-icon green"><i class="fas fa-user-check"></i></div></div>
+      <div class="sc-value">{{ active_customers|default:"489" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> 95% of total</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Deactivated</span><div class="sc-icon yellow"><i class="fas fa-user-clock"></i></div></div>
+      <div class="sc-value">{{ deactivated_customers|default:"18" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> 3 this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">New This Month</span><div class="sc-icon purple"><i class="fas fa-user-plus"></i></div></div>
+      <div class="sc-value">{{ new_customers|default:"14" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> vs 9 last month</div>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="card">
+    <div class="filter-bar">
+      <div class="filter-bar-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="custSearch" placeholder="Search by name, email, phone…"
+          oninput="filterTable('custTable', this.value)"/>
+      </div>
+      <select class="filter-select" onchange="filterByCol('custTable', 5, this.value)">
+        <option value="all">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Deactivated">Deactivated</option>
+      </select>
+      <select class="filter-select" onchange="filterByCol('custTable', 4, this.value)">
+        <option value="all">All Fuel Types</option>
+        <option>Petrol</option>
+        <option>Diesel</option>
+        <option>Kerosene</option>
+        <option>Bio-Fuel</option>
+      </select>
+    </div>
+
+    <div class="card-header">
+      <span class="card-title">All Customers</span>
+      <span class="text-sm text-muted">{{ customers|length|default:"8" }} records</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table" id="custTable">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th>Total Orders</th>
+            <th>Total Spent</th>
+            <th>Fuel Pref.</th>
+            <th>Joined</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if customers %}
+            {% for c in customers %}
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar blue">{{ c.first_name.0 }}{{ c.last_name.0 }}</div>
+                  <div>
+                    <div class="user-name">{{ c.get_full_name }}</div>
+                    <div class="user-email">{{ c.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-sm">{{ c.phone|default:"—" }}</td>
+              <td style="font-weight:600;color:var(--text)">{{ c.order_count|default:"0" }}</td>
+              <td style="color:var(--accent);font-weight:600">${{ c.total_spent|default:"0" }}</td>
+              <td>{{ c.fuel_preference|default:"—" }}</td>
+              <td class="text-sm text-muted">{{ c.date_joined|date:"M d, Y" }}</td>
+              <td><span class="badge badge-{{ c.is_active|yesno:'active,deactivated' }}"><i class="fas fa-circle"></i>{{ c.is_active|yesno:"Active,Deactivated" }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="btn btn-ghost btn-icon" title="Edit" onclick="openEditCustomerModal('{{ c.id }}','{{ c.get_full_name }}','{{ c.email }}','{{ c.phone }}')"><i class="fas fa-pen"></i></button>
+                  <button class="btn btn-warning btn-icon" title="{{ c.is_active|yesno:'Deactivate,Activate' }}" onclick="toggleCustomer('{{ c.id }}','{{ c.is_active|yesno:'deactivate,activate' }}')"><i class="fas fa-{{ c.is_active|yesno:'toggle-off,toggle-on' }}"></i></button>
+                  <button class="btn btn-danger btn-icon" title="Delete" onclick="openDeleteModal('Customer','{{ c.get_full_name }}','{% url 'delete_customer' c.id %}')"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <!-- Demo rows -->
+          {% for i in "1,2,3,4,5,6,7,8"|split:"," %}
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar {% cycle 'blue' 'green' 'orange' 'purple' 'blue' 'green' 'orange' 'purple' %}" style="font-size:0.72rem">
+                  {% cycle 'JM' 'SK' 'RO' 'AP' 'MW' 'PB' 'TW' 'HL' %}
+                </div>
+                <div>
+                  <div class="user-name">{% cycle 'James Mitchell' 'Sarah Kim' 'Robert Osei' 'Anna Peters' 'Marcus Webb' 'Paula Brown' 'Tom Watson' 'Harbour Logistics' %}</div>
+                  <div class="user-email">{% cycle 'james@ex.com' 'sarah@ex.com' 'robert@ex.com' 'anna@ex.com' 'marcus@ex.com' 'paula@ex.com' 'tom@ex.com' 'harbour@ex.com' %}</div>
+                </div>
+              </div>
+            </td>
+            <td class="text-sm">{% cycle '+1 555 0100' '+1 555 0101' '+1 555 0102' '+1 555 0103' '+1 555 0104' '+1 555 0105' '+1 555 0106' '+1 555 0107' %}</td>
+            <td style="font-weight:600;color:var(--text)">{% cycle '24' '18' '36' '9' '12' '5' '41' '8' %}</td>
+            <td style="color:var(--accent);font-weight:600">{% cycle '$2,614' '$1,980' '$4,120' '$876' '$1,240' '$520' '$4,890' '$740' %}</td>
+            <td class="text-sm">{% cycle 'Diesel' 'Petrol' 'Diesel' 'Bio-Fuel' 'Kerosene' 'Petrol' 'Diesel' 'Kerosene' %}</td>
+            <td class="text-sm text-muted">{% cycle 'Jan 2024' 'Mar 2024' 'Jun 2023' 'Sep 2024' 'Nov 2023' 'Feb 2025' 'Apr 2022' 'Aug 2024' %}</td>
+            <td>
+              {% if forloop.counter == 3 %}
+                <span class="badge badge-deactivated"><i class="fas fa-circle"></i>Deactivated</span>
+              {% else %}
+                <span class="badge badge-active"><i class="fas fa-circle"></i>Active</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="action-group">
+                <button class="btn btn-ghost btn-icon" title="Edit"
+                  onclick="openEditCustomerModal('{{ i }}','{% cycle 'James Mitchell' 'Sarah Kim' 'Robert Osei' 'Anna Peters' 'Marcus Webb' 'Paula Brown' 'Tom Watson' 'Harbour Logistics' %}','{% cycle 'james@ex.com' 'sarah@ex.com' 'robert@ex.com' 'anna@ex.com' 'marcus@ex.com' 'paula@ex.com' 'tom@ex.com' 'harbour@ex.com' %}','+1 555 010{{ i }}')">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button class="btn btn-warning btn-icon" title="Deactivate"
+                  onclick="openDeactivateModal('{{ i }}','{% cycle 'James Mitchell' 'Sarah Kim' 'Robert Osei' 'Anna Peters' 'Marcus Webb' 'Paula Brown' 'Tom Watson' 'Harbour Logistics' %}')">
+                  <i class="fas fa-toggle-{% cycle 'off' 'off' 'on' 'off' 'off' 'off' 'off' 'off' %}"></i>
+                </button>
+                <button class="btn btn-danger btn-icon" title="Delete"
+                  onclick="openDeleteModal('Customer','{% cycle 'James Mitchell' 'Sarah Kim' 'Robert Osei' 'Anna Peters' 'Marcus Webb' 'Paula Brown' 'Tom Watson' 'Harbour Logistics' %}','/admin/customers/{{ i }}/delete/')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- Edit Customer Modal -->
+<div class="modal-overlay" id="editCustomerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Customer</span>
+      <button class="modal-close" onclick="closeModal('editCustomerModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" id="editCustomerForm">
+        {% csrf_token %}
+        <div class="form-2col">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="full_name" class="form-input" id="ecName"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" name="phone" class="form-input" id="ecPhone"/>
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-input" id="ecEmail"/>
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Fuel Preference</label>
+            <select name="fuel_preference" class="form-select-lg">
+              <option>Petrol</option><option>Diesel</option>
+              <option>Kerosene</option><option>Bio-Fuel</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('editCustomerModal')">Cancel</button>
+      <button class="btn btn-admin" onclick="saveCustomerEdit()"><i class="fas fa-check"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Deactivate Confirm Modal -->
+<div class="modal-overlay" id="deactivateModal">
+  <div class="modal modal-sm">
+    <div class="modal-body" style="padding:28px 24px">
+      <div class="confirm-danger-icon"><i class="fas fa-user-slash" style="color:var(--warning)"></i></div>
+      <div class="confirm-danger-text">
+        <h4>Deactivate <span id="deactivateName" style="color:var(--warning)"></span>?</h4>
+        <p>This customer will not be able to log in or place orders until reactivated.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('deactivateModal')">Cancel</button>
+      <form method="POST" id="deactivateForm">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning"><i class="fas fa-user-slash"></i> Deactivate</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal modal-sm">
+    <div class="modal-body" style="padding:28px 24px">
+      <div class="confirm-danger-icon"><i class="fas fa-triangle-exclamation"></i></div>
+      <div class="confirm-danger-text">
+        <h4>Delete <span id="deleteTargetLabel" style="color:var(--danger)"></span>?</h4>
+        <p>This will permanently remove this customer and all their order history.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+      <form method="POST" id="deleteForm">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/admin.js' %}"></script>
+<script>
+  function openEditCustomerModal(id, name, email, phone) {
+    document.getElementById('ecName').value  = name;
+    document.getElementById('ecEmail').value = email;
+    document.getElementById('ecPhone').value = phone;
+    document.getElementById('editCustomerForm').action = '/admin/customers/' + id + '/edit/';
+    openModal('editCustomerModal');
+  }
+  function saveCustomerEdit() {
+    closeModal('editCustomerModal');
+    showDashToast('Customer details updated successfully!', 'fa-check-circle', 'var(--success)');
+  }
+  function openDeactivateModal(id, name) {
+    document.getElementById('deactivateName').textContent = name;
+    document.getElementById('deactivateForm').action = '/admin/customers/' + id + '/deactivate/';
+    openModal('deactivateModal');
+  }
+  function openDeleteModal(type, name, url) {
+    document.getElementById('deleteTargetLabel').textContent = name;
+    document.getElementById('deleteForm').action = url;
+    openModal('deleteModal');
+  }
+</script>
+</body>
+</html>

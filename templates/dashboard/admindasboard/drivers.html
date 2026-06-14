@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Manage Drivers</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/adminsidebar.html' with active='drivers' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Manage Drivers</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-admin btn-sm" onclick="openModal('addDriverModal')">
+      <i class="fas fa-user-plus"></i> Add Driver
+    </button>
+    <a href="{% url 'admin_settings' %}" class="topbar-btn" style="margin-left:4px"><i class="fas fa-gear"></i></a>
+    <a href="{% url 'admin_settings' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"A" }}{{ request.user.last_name.0|default:"D" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Admin" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Stats strip -->
+  <div class="stats-grid mb-24">
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Total Drivers</span><div class="sc-icon blue"><i class="fas fa-truck-fast"></i></div></div>
+      <div class="sc-value">{{ total_drivers|default:"18" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> 11 online now</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">On Delivery</span><div class="sc-icon orange"><i class="fas fa-road"></i></div></div>
+      <div class="sc-value">{{ on_delivery|default:"6" }}</div>
+      <div class="sc-change info"><i class="fas fa-circle"></i> active routes</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Today's Deliveries</span><div class="sc-icon green"><i class="fas fa-circle-check"></i></div></div>
+      <div class="sc-value">{{ todays_deliveries|default:"22" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 4 vs yesterday</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top"><span class="sc-label">Avg. On-Time Rate</span><div class="sc-icon yellow"><i class="fas fa-star"></i></div></div>
+      <div class="sc-value">{{ avg_ontime|default:"96" }}<span style="font-size:1.2rem">%</span></div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 1% this month</div>
+    </div>
+  </div>
+
+  <!-- Drivers Table -->
+  <div class="card">
+    <div class="filter-bar">
+      <div class="filter-bar-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="drvSearch" placeholder="Search by name, email, vehicle…"
+          oninput="filterTable('drvTable', this.value)"/>
+      </div>
+      <select class="filter-select" onchange="filterByCol('drvTable', 5, this.value)">
+        <option value="all">All Statuses</option>
+        <option value="Online">Online</option>
+        <option value="Offline">Offline</option>
+        <option value="On Delivery">On Delivery</option>
+      </select>
+      <select class="filter-select" onchange="filterByCol('drvTable', 4, this.value)">
+        <option value="all">All Roles</option>
+        <option value="Driver">Driver</option>
+        <option value="Senior Driver">Senior Driver</option>
+        <option value="Supervisor">Supervisor</option>
+      </select>
+    </div>
+
+    <div class="card-header">
+      <span class="card-title">All Drivers</span>
+      <button class="btn btn-admin btn-sm" onclick="openModal('addDriverModal')">
+        <i class="fas fa-plus"></i> Add New Driver
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table" id="drvTable">
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th>Phone</th>
+            <th>Vehicle</th>
+            <th>Total Deliveries</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>On-Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if drivers %}
+            {% for d in drivers %}
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar green">{{ d.first_name.0 }}{{ d.last_name.0 }}</div>
+                  <div>
+                    <div class="user-name">{{ d.get_full_name }}</div>
+                    <div class="user-email">{{ d.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-sm">{{ d.phone|default:"—" }}</td>
+              <td class="text-sm">{{ d.vehicle|default:"—" }}</td>
+              <td style="font-weight:600;color:var(--text);text-align:center">{{ d.delivery_count|default:"0" }}</td>
+              <td><span class="badge badge-admin">{{ d.role|default:"Driver" }}</span></td>
+              <td>
+                <span class="badge badge-{% if d.is_online %}active{% elif d.on_delivery %}en-route{% else %}inactive{% endif %}">
+                  <i class="fas fa-circle"></i>
+                  {% if d.is_online %}Online{% elif d.on_delivery %}On Delivery{% else %}Offline{% endif %}
+                </span>
+              </td>
+              <td style="color:var(--success);font-weight:700">{{ d.on_time_rate|default:"96" }}%</td>
+              <td>
+                <div class="action-group">
+                  <button class="btn btn-ghost btn-icon" title="View Deliveries" onclick="openDriverDeliveriesModal('{{ d.id }}','{{ d.get_full_name }}')"><i class="fas fa-list"></i></button>
+                  <button class="btn btn-ghost btn-icon" title="Change Role" onclick="openChangeRoleModal('{{ d.id }}','{{ d.get_full_name }}','{{ d.role }}')"><i class="fas fa-shield-halved"></i></button>
+                  <button class="btn btn-danger btn-icon" title="Delete" onclick="openDeleteModal('Driver','{{ d.get_full_name }}','{% url 'delete_driver' d.id %}')"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <!-- Demo rows -->
+          {% for i in "1,2,3,4,5,6"|split:"," %}
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar {% cycle 'green' 'blue' 'purple' 'orange' 'green' 'blue' %}" style="font-size:0.72rem">
+                  {% cycle 'CR' 'JK' 'PN' 'TO' 'LW' 'BM' %}
+                </div>
+                <div>
+                  <div class="user-name">{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}</div>
+                  <div class="user-email">{% cycle 'carlos@ff.io' 'james@ff.io' 'priya@ff.io' 'tom@ff.io' 'lily@ff.io' 'ben@ff.io' %}</div>
+                </div>
+              </div>
+            </td>
+            <td class="text-sm">{% cycle '+1 555 0199' '+1 555 0198' '+1 555 0197' '+1 555 0196' '+1 555 0195' '+1 555 0194' %}</td>
+            <td class="text-sm">{% cycle 'Isuzu NPR · TXB4421' 'Ford Transit · KAL 882' 'Toyota Dyna · PRM 774' 'Hino 300 · ZXC 219' 'Isuzu Elf · GHJ 341' 'MAN TGL · BNM 556' %}</td>
+            <td style="font-weight:600;color:var(--text);text-align:center">{% cycle '148' '122' '97' '88' '64' '41' %}</td>
+            <td><span class="badge badge-admin">{% cycle 'Senior Driver' 'Driver' 'Supervisor' 'Driver' 'Driver' 'Driver' %}</span></td>
+            <td>
+              <span class="badge badge-{% cycle 'active' 'en-route' 'inactive' 'active' 'en-route' 'active' %}">
+                <i class="fas fa-circle"></i>
+                {% cycle 'Online' 'On Delivery' 'Offline' 'Online' 'On Delivery' 'Online' %}
+              </span>
+            </td>
+            <td style="color:var(--success);font-weight:700">{% cycle '96%' '98%' '94%' '97%' '92%' '95%' %}</td>
+            <td>
+              <div class="action-group">
+                <button class="btn btn-ghost btn-icon" title="View Deliveries"
+                  onclick="openDriverDeliveriesModal('{{ i }}','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}')">
+                  <i class="fas fa-list"></i>
+                </button>
+                <button class="btn btn-ghost btn-icon" title="Change Role"
+                  onclick="openChangeRoleModal('{{ i }}','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}','{% cycle 'Senior Driver' 'Driver' 'Supervisor' 'Driver' 'Driver' 'Driver' %}')">
+                  <i class="fas fa-shield-halved"></i>
+                </button>
+                <button class="btn btn-danger btn-icon" title="Delete"
+                  onclick="openDeleteModal('Driver','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}','/admin/drivers/{{ i }}/delete/')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- Add Driver Modal -->
+<div class="modal-overlay" id="addDriverModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add New Driver</span>
+      <button class="modal-close" onclick="closeModal('addDriverModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" action="{% url 'add_driver' %}" id="addDriverForm">
+        {% csrf_token %}
+        <div class="form-2col">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-input" placeholder="First name" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-input" placeholder="Last name" required/>
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-input" placeholder="driver@example.com" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-input" placeholder="+1 555 0100" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Licence Number</label>
+            <input type="text" name="licence_no" class="form-input" placeholder="DL-XXXX-XXXX" required/>
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Vehicle (Model · Plate)</label>
+            <input type="text" name="vehicle" class="form-input" placeholder="e.g. Isuzu NPR · TXB 4421"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select-lg">
+              <option value="Driver">Driver</option>
+              <option value="Senior Driver">Senior Driver</option>
+              <option value="Supervisor">Supervisor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Temporary Password</label>
+            <input type="password" name="password" class="form-input" placeholder="Set initial password" required/>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addDriverModal')">Cancel</button>
+      <button class="btn btn-admin" onclick="submitAddDriver()"><i class="fas fa-user-plus"></i> Add Driver</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Role Modal -->
+<div class="modal-overlay" id="changeRoleModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Change Role</span>
+      <button class="modal-close" onclick="closeModal('changeRoleModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:14px">
+        Changing role for: <strong id="crDriverName" style="color:var(--text)"></strong>
+      </p>
+      <form method="POST" id="changeRoleForm">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">New Role</label>
+          <select name="role" class="form-select-lg" id="crRoleSelect">
+            <option value="Driver">Driver</option>
+            <option value="Senior Driver">Senior Driver</option>
+            <option value="Supervisor">Supervisor</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('changeRoleModal')">Cancel</button>
+      <button class="btn btn-admin" onclick="saveRoleChange()"><i class="fas fa-check"></i> Update Role</button>
+    </div>
+  </div>
+</div>
+
+<!-- Driver Deliveries Modal -->
+<div class="modal-overlay" id="driverDeliveriesModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title">Deliveries — <span id="ddDriverName" style="color:var(--admin)"></span></span>
+      <button class="modal-close" onclick="closeModal('driverDeliveriesModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr><th>Order ID</th><th>Customer</th><th>Fuel / Qty</th><th>Date</th><th>Duration</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="row-id">#FF-2045</span></td><td>Robert Osei</td><td>Diesel 300L</td><td class="text-muted text-sm">Jun 3, 2026</td><td class="text-sm">52 min</td><td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td></tr>
+            <tr><td><span class="row-id">#FF-2043</span></td><td>Sarah Kim</td><td>Petrol 100L</td><td class="text-muted text-sm">Jun 3, 2026</td><td class="text-sm">38 min</td><td><span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span></td></tr>
+            <tr><td><span class="row-id">#FF-2039</span></td><td>James Mitchell</td><td>Bio-Fuel 150L</td><td class="text-muted text-sm">May 30, 2026</td><td class="text-sm">44 min</td><td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td></tr>
+            <tr><td><span class="row-id">#FF-2036</span></td><td>Anna Peters</td><td>Diesel 200L</td><td class="text-muted text-sm">May 28, 2026</td><td class="text-sm">1h 2m</td><td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('driverDeliveriesModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal modal-sm">
+    <div class="modal-body" style="padding:28px 24px">
+      <div class="confirm-danger-icon"><i class="fas fa-triangle-exclamation"></i></div>
+      <div class="confirm-danger-text">
+        <h4>Delete <span id="deleteTargetLabel" style="color:var(--danger)"></span>?</h4>
+        <p>This will permanently remove this driver and all their delivery records.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+      <form method="POST" id="deleteForm">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'admin_panel/js/admin.js' %}"></script>
+<script>
+  function openDriverDeliveriesModal(id, name) {
+    document.getElementById('ddDriverName').textContent = name;
+    openModal('driverDeliveriesModal');
+  }
+  function openChangeRoleModal(id, name, currentRole) {
+    document.getElementById('crDriverName').textContent = name;
+    document.getElementById('crRoleSelect').value = currentRole;
+    document.getElementById('changeRoleForm').action = '/admin/drivers/' + id + '/role/';
+    openModal('changeRoleModal');
+  }
+  function saveRoleChange() {
+    closeModal('changeRoleModal');
+    showDashToast('Driver role updated successfully!', 'fa-shield-halved', 'var(--admin)');
+  }
+  function openDeleteModal(type, name, url) {
+    document.getElementById('deleteTargetLabel').textContent = name;
+    document.getElementById('deleteForm').action = url;
+    openModal('deleteModal');
+  }
+  function submitAddDriver() {
+    const form = document.getElementById('addDriverForm');
+    const inputs = form.querySelectorAll('input[required]');
+    let valid = true;
+    inputs.forEach(i => { if (!i.value.trim()) { i.style.borderColor = 'var(--danger)'; valid = false; } else i.style.borderColor = ''; });
+    if (valid) { closeModal('addDriverModal'); showDashToast('New driver added successfully!', 'fa-user-plus', 'var(--success)'); }
+  }
+</script>
+</body>
+</html>
