@@ -1,0 +1,279 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – My Deliveries</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/driver.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/driversidebar.html' with active='my_deliveries' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">My Deliveries</span>
+  </div>
+  <div class="topbar-right">
+    <div class="online-toggle" id="onlineToggle" onclick="toggleOnlineStatus()">
+      <div class="ot-dot" id="otDot"></div>
+      <span class="ot-label" id="otLabel">Online</span>
+    </div>
+    <a href="{% url 'driver_profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"D" }}{{ request.user.last_name.0|default:"R" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Driver" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- ACTIVE DELIVERY (if any) — UPDATE STATUS SECTION -->
+  {% if active_delivery %}
+  <div class="card mb-24" style="border-color:rgba(59,130,246,0.25)">
+    <div class="card-header" style="background:rgba(59,130,246,0.05)">
+      <div>
+        <span class="card-title" style="color:var(--driver)">
+          <i class="fas fa-truck-fast" style="font-size:0.9rem;margin-right:8px"></i>
+          Active Delivery — #{{ active_delivery.id|default:"FF-2043" }}
+        </span>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">
+          Update the status as your delivery progresses
+        </p>
+      </div>
+      <span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span>
+    </div>
+    <div class="card-body">
+
+      <!-- Status stepper -->
+      <div class="status-stepper mb-24" id="statusStepper">
+        <div class="ss-step done" data-step="1">
+          <div class="ss-dot"><i class="fas fa-check"></i></div>
+          <span class="ss-label">Order<br/>Accepted</span>
+        </div>
+        <div class="ss-step done" data-step="2">
+          <div class="ss-dot"><i class="fas fa-check"></i></div>
+          <span class="ss-label">Fuel<br/>Loaded</span>
+        </div>
+        <div class="ss-step active" data-step="3">
+          <div class="ss-dot"><i class="fas fa-truck"></i></div>
+          <span class="ss-label">En Route<br/>to Customer</span>
+        </div>
+        <div class="ss-step pending" data-step="4">
+          <div class="ss-dot"><i class="fas fa-house"></i></div>
+          <span class="ss-label">Arrived at<br/>Location</span>
+        </div>
+        <div class="ss-step pending" data-step="5">
+          <div class="ss-dot"><i class="fas fa-circle-check"></i></div>
+          <span class="ss-label">Delivery<br/>Complete</span>
+        </div>
+      </div>
+
+      <!-- Update form -->
+      <form method="POST" action="{% url 'update_status' active_delivery.id|default:1 %}" id="statusForm">
+        {% csrf_token %}
+        <div class="row-2col" style="gap:18px;align-items:end">
+          <div class="form-group">
+            <label class="form-label">Update Status To</label>
+            <select name="status" class="form-select" id="statusSelect" onchange="updateStepper(this.value)">
+              <option value="Fuel Loaded"   {% if active_delivery.status == 'Fuel Loaded' %}selected{% endif %}>Fuel Loaded – Ready to Depart</option>
+              <option value="En Route"      {% if active_delivery.status == 'En Route' %}selected{% endif %}>En Route – Driving to Customer</option>
+              <option value="Arrived"       {% if active_delivery.status == 'Arrived' %}selected{% endif %}>Arrived – At Customer Location</option>
+              <option value="Delivered"     {% if active_delivery.status == 'Delivered' %}selected{% endif %}>Delivered – Fuel Dispensed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Note (optional)</label>
+            <input type="text" name="note" class="form-input" placeholder="e.g. Gate was locked, called customer..."/>
+          </div>
+          <div style="display:flex;gap:10px;grid-column:1/-1;justify-content:flex-end">
+            <a href="{% url 'delivery_detail' active_delivery.id|default:1 %}" class="btn btn-ghost">
+              <i class="fas fa-eye"></i> View Full Details
+            </a>
+            <button type="submit" class="btn btn-driver btn-lg" id="updateStatusBtn">
+              <i class="fas fa-arrows-rotate"></i> Update Status
+            </button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ALL ASSIGNED DELIVERIES TABLE -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Assigned Deliveries</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm status-filter active" data-f="all">All</button>
+        <button class="btn btn-ghost btn-sm status-filter" data-f="active">Active</button>
+        <button class="btn btn-ghost btn-sm status-filter" data-f="pending">Pending</button>
+        <button class="btn btn-ghost btn-sm status-filter" data-f="delivered">Delivered</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="delivery-table" id="deliveryTable">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Fuel / Qty</th>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Slot</th>
+            <th>Assigned</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if my_deliveries %}
+            {% for d in my_deliveries %}
+            <tr data-status="{{ d.status|lower }}">
+              <td><span class="del-id">#{{ d.id }}</span></td>
+              <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>{{ d.fuel_type }}</span> {{ d.quantity }}L</td>
+              <td class="text-sm">{{ d.customer_name }}</td>
+              <td class="text-muted text-sm">{{ d.delivery_address }}</td>
+              <td class="text-sm">{{ d.time_slot }}</td>
+              <td class="text-muted text-sm">{{ d.assigned_date|date:"M d" }}</td>
+              <td><span class="badge badge-{{ d.status|lower|replace:' ','-' }}"><i class="fas fa-circle"></i>{{ d.status }}</span></td>
+              <td style="display:flex;gap:6px">
+                <a href="{% url 'delivery_detail' d.id %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a>
+                {% if d.status != 'Delivered' %}
+                <button class="btn btn-driver btn-sm" onclick="openUpdateModal('{{ d.id }}','{{ d.status }}')">
+                  <i class="fas fa-arrows-rotate"></i> Update
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <!-- Demo rows -->
+          <tr data-status="delivered">
+            <td><span class="del-id">#FF-2042</span></td>
+            <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>Diesel</span> 200L</td>
+            <td class="text-sm">James Mitchell</td>
+            <td class="text-muted text-sm">45 Main St, Downtown</td>
+            <td class="text-sm">8AM–12PM</td>
+            <td class="text-muted text-sm">Jun 3</td>
+            <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
+            <td><a href="{% url 'delivery_detail' 1 %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a></td>
+          </tr>
+          <tr data-status="en-route">
+            <td><span class="del-id">#FF-2043</span></td>
+            <td><span class="fuel-pill"><i class="fas fa-fire-flame-curved"></i>Petrol</span> 100L</td>
+            <td class="text-sm">Sarah Kim</td>
+            <td class="text-muted text-sm">12 Park Ave, Westside</td>
+            <td class="text-sm">12PM–5PM</td>
+            <td class="text-muted text-sm">Jun 3</td>
+            <td><span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span></td>
+            <td style="display:flex;gap:6px">
+              <a href="{% url 'delivery_detail' 2 %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a>
+              <button class="btn btn-driver btn-sm" onclick="openUpdateModal('FF-2043','En Route')"><i class="fas fa-arrows-rotate"></i> Update</button>
+            </td>
+          </tr>
+          <tr data-status="pending">
+            <td><span class="del-id">#FF-2044</span></td>
+            <td><span class="fuel-pill"><i class="fas fa-leaf"></i>Bio-Fuel</span> 150L</td>
+            <td class="text-sm">Robert Osei</td>
+            <td class="text-muted text-sm">8 Commerce Rd</td>
+            <td class="text-sm">5PM–8PM</td>
+            <td class="text-muted text-sm">Jun 3</td>
+            <td><span class="badge badge-pending"><i class="fas fa-circle"></i>Pending</span></td>
+            <td style="display:flex;gap:6px">
+              <a href="{% url 'delivery_detail' 3 %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a>
+              <button class="btn btn-driver btn-sm" onclick="openUpdateModal('FF-2044','Pending')"><i class="fas fa-arrows-rotate"></i> Update</button>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- Quick Update Modal -->
+<div class="modal-overlay" id="updateModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Update Status — <span id="umOrderId" style="color:var(--primary)"></span></span>
+      <button class="modal-close" onclick="closeModal('updateModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" action="{% url 'update_status' 0 %}" id="modalStatusForm">
+        {% csrf_token %}
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="form-group">
+            <label class="form-label">New Status</label>
+            <select name="status" class="form-select" id="umStatusSelect">
+              <option value="Fuel Loaded">Fuel Loaded – Ready to Depart</option>
+              <option value="En Route">En Route – Driving to Customer</option>
+              <option value="Arrived">Arrived – At Customer Location</option>
+              <option value="Delivered">Delivered – Fuel Dispensed ✓</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Note (optional)</label>
+            <textarea class="form-textarea" name="note" placeholder="Any relevant notes..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('updateModal')">Cancel</button>
+      <button class="btn btn-driver" onclick="submitStatusUpdate()">
+        <i class="fas fa-arrows-rotate"></i> Confirm Update
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/driver.js' %}"></script>
+<script>
+  /* Status filter */
+  document.querySelectorAll('.status-filter').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.status-filter').forEach(b => { b.classList.remove('active'); b.className = b.className.replace('btn-driver','btn-ghost'); });
+      this.classList.add('active'); this.className = this.className.replace('btn-ghost','btn-driver');
+      const f = this.dataset.f;
+      document.querySelectorAll('#deliveryTable tbody tr').forEach(row => {
+        row.style.display = (f === 'all' || row.dataset.status === f) ? '' : 'none';
+      });
+    });
+  });
+
+  function openUpdateModal(orderId, currentStatus) {
+    document.getElementById('umOrderId').textContent = '#' + orderId;
+    const select = document.getElementById('umStatusSelect');
+    for (let opt of select.options) { if (opt.value === currentStatus) { opt.selected = true; break; } }
+    document.getElementById('updateModal').classList.add('active');
+  }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+  function submitStatusUpdate() {
+    closeModal('updateModal');
+    showDashToast('Delivery status updated successfully!', 'fa-circle-check', 'var(--success)');
+  }
+
+  /* Stepper sync with select */
+  const statusToStep = { 'Fuel Loaded': 2, 'En Route': 3, 'Arrived': 4, 'Delivered': 5 };
+  function updateStepper(val) {
+    const activeStep = statusToStep[val] || 3;
+    document.querySelectorAll('.ss-step').forEach((step, i) => {
+      const n = i + 1;
+      step.classList.remove('done','active','pending');
+      if (n < activeStep)      step.classList.add('done');
+      else if (n === activeStep) step.classList.add('active');
+      else                     step.classList.add('pending');
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Driver Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/driver.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/driversidebar.html' with active='profile' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">My Profile</span>
+  </div>
+  <div class="topbar-right">
+    <div class="online-toggle" id="onlineToggle" onclick="toggleOnlineStatus()">
+      <div class="ot-dot" id="otDot"></div>
+      <span class="ot-label" id="otLabel">Online</span>
+    </div>
+    <a href="{% url 'driver_profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"D" }}{{ request.user.last_name.0|default:"R" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Driver" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Profile Hero -->
+  <div style="background:linear-gradient(135deg,var(--dark3),var(--dark2));border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden">
+    <!-- Decorative glow -->
+    <div style="position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(59,130,246,0.12),transparent);border-radius:50%;pointer-events:none"></div>
+    <!-- Avatar -->
+    <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--driver),var(--driver-dark));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:2rem;color:white;flex-shrink:0;border:3px solid rgba(59,130,246,0.35);box-shadow:0 8px 24px rgba(59,130,246,0.3);position:relative;z-index:1">
+      {{ request.user.first_name.0|default:"C" }}{{ request.user.last_name.0|default:"R" }}
+    </div>
+    <div style="position:relative;z-index:1;flex:1">
+      <div style="font-family:var(--font-display);font-size:1.9rem;letter-spacing:0.05em;color:var(--white)">
+        {{ request.user.get_full_name|default:"Carlos Rivera" }}
+      </div>
+      <div style="font-size:0.83rem;color:var(--text-muted);margin:4px 0 10px">
+        {{ request.user.email|default:"carlos@fuelflow.io" }}
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:0.75rem;color:var(--text-muted)">
+          <i class="fas fa-id-badge" style="color:var(--driver)"></i> Driver ID: {{ driver.driver_id|default:"DRV-004" }}
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:0.75rem;color:var(--text-muted)">
+          <i class="fas fa-truck" style="color:var(--driver)"></i> {{ driver.vehicle|default:"Isuzu NPR — TXB 4421" }}
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:20px;padding:4px 12px;font-size:0.75rem;color:var(--success)">
+          <i class="fas fa-circle" style="font-size:0.5rem"></i> Online &amp; Available
+        </span>
+      </div>
+    </div>
+    <!-- Edit button -->
+    <button class="btn btn-driver" id="editToggleBtn" onclick="toggleEdit()">
+      <i class="fas fa-pen"></i> Edit Profile
+    </button>
+  </div>
+
+  <div class="row-2col" style="gap:20px;align-items:start">
+
+    <!-- LEFT: Personal + Vehicle info -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Personal Info -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Personal Information</span>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'update_driver_profile' %}" id="profileForm">
+            {% csrf_token %}
+            <div class="form-2col">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-input pf" readonly
+                  value="{{ request.user.first_name|default:'Carlos' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-input pf" readonly
+                  value="{{ request.user.last_name|default:'Rivera' }}"/>
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input pf" readonly
+                  value="{{ request.user.email|default:'carlos@fuelflow.io' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="phone" class="form-input pf" readonly
+                  value="{{ driver.phone|default:'+1 555 0199' }}"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Driver Licence No.</label>
+                <input type="text" name="licence_no" class="form-input pf" readonly
+                  value="{{ driver.licence_no|default:'DL-2029-8831' }}"/>
+              </div>
+            </div>
+            <!-- Save/cancel (hidden until edit) -->
+            <div id="editActions" style="display:none;justify-content:flex-end;gap:10px;margin-top:18px" class="d-flex">
+              <button type="button" class="btn btn-outline" onclick="toggleEdit()">Cancel</button>
+              <button type="submit" class="btn btn-driver"><i class="fas fa-check"></i> Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Vehicle Info -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Vehicle Details</span>
+        </div>
+        <div class="card-body">
+          <div class="detail-row"><span>Vehicle</span>          <span>{{ driver.vehicle_model|default:"Isuzu NPR 400" }}</span></div>
+          <div class="detail-row"><span>Plate Number</span>     <span>{{ driver.plate|default:"TXB 4421" }}</span></div>
+          <div class="detail-row"><span>Tank Capacity</span>    <span>{{ driver.tank_capacity|default:"1,000L" }}</span></div>
+          <div class="detail-row"><span>Fuel Cert. Exp.</span>  <span>{{ driver.fuel_cert_expiry|default:"Dec 2026" }}</span></div>
+          <div class="detail-row"><span>Last Inspection</span>  <span>{{ driver.last_inspection|default:"Apr 2026" }}</span></div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Change Password</span></div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'change_password' %}" id="pwForm">
+            {% csrf_token %}
+            <div class="form-2col">
+              <div class="form-group form-full">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="current_password" class="form-input" placeholder="••••••••"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" name="new_password" class="form-input" placeholder="••••••••" id="newPw"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-input" placeholder="••••••••" id="confPw"/>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:14px">
+              <button type="submit" class="btn btn-driver"><i class="fas fa-lock"></i> Update Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Stats + availability + danger -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Performance summary -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Performance</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 22px">
+          <div class="detail-row"><span>Total Deliveries</span>     <span style="color:var(--driver);font-weight:700">{{ total_delivered|default:"148" }}</span></div>
+          <div class="detail-row"><span>This Month</span>           <span style="font-weight:700">{{ this_month|default:"22" }}</span></div>
+          <div class="detail-row"><span>Litres Delivered</span>     <span style="font-weight:700">{{ total_litres|default:"22,400L" }}</span></div>
+          <div class="detail-row"><span>On-Time Rate</span>
+            <span style="color:var(--success);font-weight:700">{{ on_time_rate|default:"96%" }}</span>
+          </div>
+          <div class="detail-row"><span>Avg. Delivery Time</span>   <span style="font-weight:700">{{ avg_time|default:"48 min" }}</span></div>
+          <div class="detail-row"><span>Driver Since</span>         <span style="font-weight:700">{{ driver.since|default:"Jan 2024" }}</span></div>
+        </div>
+      </div>
+
+      <!-- Availability toggle -->
+      <div class="card" style="border-color:rgba(34,197,94,0.15)">
+        <div class="card-header"><span class="card-title">Availability</span></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:3px">Online Status</div>
+              <div style="font-size:0.76rem;color:var(--text-muted)">Toggle to receive / pause new orders</div>
+            </div>
+            <label class="toggle-switch" style="flex-shrink:0">
+              <input type="checkbox" id="availToggle" checked onchange="toggleOnlineStatus()"/>
+              <span class="ts-track"></span>
+            </label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:3px">Push Notifications</div>
+              <div style="font-size:0.76rem;color:var(--text-muted)">Alert me when new orders arrive</div>
+            </div>
+            <label class="toggle-switch" style="flex-shrink:0">
+              <input type="checkbox" checked/>
+              <span class="ts-track"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="card" style="border-color:rgba(239,68,68,0.12)">
+        <div class="card-header" style="border-color:rgba(239,68,68,0.08)">
+          <span class="card-title" style="color:var(--danger)">
+            <i class="fas fa-triangle-exclamation" style="margin-right:8px"></i>Danger Zone
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="text-sm text-muted mb-20">These actions are irreversible. Proceed with caution.</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <a href="{% url 'logout' %}" class="btn btn-danger w-100" style="justify-content:center">
+              <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+            <button class="btn w-100"
+              style="justify-content:center;background:rgba(239,68,68,0.05);color:var(--danger);border:1.5px solid rgba(239,68,68,0.18)"
+              onclick="if(confirm('Delete your account? This cannot be undone.')) window.location.href='{% url 'delete_account' %}'">
+              <i class="fas fa-trash"></i> Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- Toggle switch CSS -->
+<style>
+.toggle-switch { position:relative;display:inline-block;width:42px;height:24px; }
+.toggle-switch input { opacity:0;width:0;height:0; }
+.ts-track { position:absolute;inset:0;background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.3s; }
+.ts-track::before { content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;background:var(--text-muted);border-radius:50%;transition:all 0.3s; }
+.toggle-switch input:checked + .ts-track { background:var(--driver);border-color:var(--driver); }
+.toggle-switch input:checked + .ts-track::before { transform:translateX(18px);background:white; }
+</style>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/driver.js' %}"></script>
+<script>
+  let editing = false;
+  function toggleEdit() {
+    editing = !editing;
+    document.querySelectorAll('.pf').forEach(f => {
+      if (f.tagName === 'SELECT') f.disabled = !editing;
+      else f.readOnly = !editing;
+      f.style.opacity = editing ? '1' : '0.7';
+      f.style.borderColor = editing ? 'var(--driver)' : '';
+    });
+    document.getElementById('editActions').style.display = editing ? 'flex' : 'none';
+    document.getElementById('editToggleBtn').innerHTML = editing
+      ? '<i class="fas fa-times"></i> Cancel' : '<i class="fas fa-pen"></i> Edit Profile';
+  }
+
+  document.getElementById('pwForm')?.addEventListener('submit', function(e) {
+    if (document.getElementById('newPw').value !== document.getElementById('confPw').value) {
+      e.preventDefault();
+      showDashToast('Passwords do not match', 'fa-exclamation-circle', 'var(--danger)');
+    }
+  });
+</script>
+</body>
+</html>

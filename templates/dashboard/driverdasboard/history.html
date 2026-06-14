@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Delivery History</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/driver.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/driversidebar.html' with active='history' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Delivery History</span>
+  </div>
+  <div class="topbar-right">
+    <div class="online-toggle" id="onlineToggle" onclick="toggleOnlineStatus()">
+      <div class="ot-dot" id="otDot"></div>
+      <span class="ot-label" id="otLabel">Online</span>
+    </div>
+    <a href="{% url 'driver_profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"D" }}{{ request.user.last_name.0|default:"R" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Driver" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Summary stats row -->
+  <div class="stats-grid mb-24">
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">Total Delivered</span>
+        <div class="sc-icon green"><i class="fas fa-circle-check"></i></div>
+      </div>
+      <div class="sc-value">{{ total_delivered|default:"148" }}</div>
+      <div class="sc-change info"><i class="fas fa-calendar"></i> All time</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">This Month</span>
+        <div class="sc-icon blue"><i class="fas fa-truck-fast"></i></div>
+      </div>
+      <div class="sc-value">{{ this_month|default:"22" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 4 vs last month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">Total Litres</span>
+        <div class="sc-icon orange"><i class="fas fa-gas-pump"></i></div>
+      </div>
+      <div class="sc-value">{{ total_litres|default:"22.4K" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 1.8K this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">On-Time Rate</span>
+        <div class="sc-icon yellow"><i class="fas fa-star"></i></div>
+      </div>
+      <div class="sc-value">{{ on_time_rate|default:"96" }}<span style="font-size:1.2rem">%</span></div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 2% vs last month</div>
+    </div>
+  </div>
+
+  <!-- Main: table + side chart -->
+  <div class="row-7_5" style="gap:20px;align-items:start">
+
+    <!-- History Table -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Completed Deliveries</span>
+          <!-- Search + filter -->
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <select class="form-select" id="monthFilter" style="padding:7px 12px;font-size:0.8rem;width:auto"
+              onchange="filterHistory()">
+              <option value="all">All Time</option>
+              <option value="jun">June 2026</option>
+              <option value="may">May 2026</option>
+              <option value="apr">April 2026</option>
+            </select>
+            <div style="position:relative">
+              <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.75rem"></i>
+              <input type="text" id="historySearch" class="form-input" placeholder="Search…"
+                style="padding-left:30px;padding-top:8px;padding-bottom:8px;width:180px"
+                oninput="filterHistory()"/>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="history-table" id="historyTable">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Fuel / Qty</th>
+                <th>Address</th>
+                <th>Date</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if history %}
+                {% for d in history %}
+                <tr>
+                  <td><span class="del-id">#{{ d.id }}</span></td>
+                  <td class="text-sm">{{ d.customer_name }}</td>
+                  <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>{{ d.fuel_type }}</span> {{ d.quantity }}L</td>
+                  <td class="text-muted text-sm">{{ d.delivery_address }}</td>
+                  <td class="text-muted text-sm">{{ d.delivered_at|date:"M d, Y" }}</td>
+                  <td class="text-sm">{{ d.duration|default:"—" }}</td>
+                  <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
+                  <td><a href="{% url 'delivery_detail' d.id %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a></td>
+                </tr>
+                {% endfor %}
+              {% else %}
+              <!-- Demo rows -->
+              {% for row in "1,2,3,4,5,6,7,8"|split:"," %}
+              <tr data-month="{% cycle 'jun' 'jun' 'may' 'may' 'may' 'apr' 'apr' 'apr' %}">
+                <td><span class="del-id">#FF-20{% cycle '42' '41' '40' '39' '38' '37' '36' '35' %}</span></td>
+                <td class="text-sm">{% cycle 'James Mitchell' 'Sarah Kim' 'Robert Osei' 'Anna Peters' 'Marcus Webb' 'James Mitchell' 'Sarah Kim' 'Robert Osei' %}</td>
+                <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>{% cycle 'Diesel' 'Diesel' 'Petrol' 'Bio-Fuel' 'Kerosene' 'Diesel' 'Petrol' 'Diesel' %}</span> {% cycle '200' '200' '100' '150' '80' '300' '100' '200' %}L</td>
+                <td class="text-muted text-sm">{% cycle '45 Main St' '45 Main St' '12 Park Ave' '7 Green Valley' 'Factory Gate 3' 'Site B Industrial' '22 Bloom St' '45 Main St' %}</td>
+                <td class="text-muted text-sm">{% cycle 'Jun 3' 'Jun 2' 'May 30' 'May 28' 'May 22' 'Apr 30' 'Apr 28' 'Apr 25' %}, 2026</td>
+                <td class="text-sm">{% cycle '45 min' '52 min' '38 min' '1h 2m' '28 min' '1h 15m' '40 min' '48 min' %}</td>
+                <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
+                <td><a href="{% url 'delivery_detail' forloop.counter %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a></td>
+              </tr>
+              {% endfor %}
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side: Monthly breakdown -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Monthly bars -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Monthly Deliveries</span>
+        </div>
+        <div class="card-body">
+          <div class="earnings-bar">
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Jun</span><div class="eb-track"><div class="eb-fill" data-w="50"  style="width:0"></div></div><span class="eb-val">22</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">May</span><div class="eb-track"><div class="eb-fill" data-w="82"  style="width:0"></div></div><span class="eb-val">36</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Apr</span><div class="eb-track"><div class="eb-fill" data-w="68"  style="width:0"></div></div><span class="eb-val">30</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Mar</span><div class="eb-track"><div class="eb-fill" data-w="100" style="width:0"></div></div><span class="eb-val">44</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Feb</span><div class="eb-track"><div class="eb-fill" data-w="36"  style="width:0"></div></div><span class="eb-val">16</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fuel breakdown -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Fuel Breakdown</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+          {% for fuel, pct, count in fuel_breakdown|default:"Diesel,62,92|Petrol,24,36|Bio-Fuel,9,13|Kerosene,5,7"|split:"|" %}
+          {% with parts=fuel.split:',' %}
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.78rem;color:var(--text)">{{ parts.0 }}</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)">{{ parts.2 }} trips ({{ parts.1 }}%)</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:{{ parts.1 }}%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            </div>
+          </div>
+          {% endwith %}
+          {% empty %}
+          <!-- Static fallback -->
+          {% for item in "Diesel,62,92|Petrol,24,36|Bio-Fuel,9,13|Kerosene,5,7"|split:"|" %}
+          {% with p=item|split:',' %}
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.78rem;color:var(--text)">{{ p.0 }}</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)">{{ p.2 }} trips ({{ p.1 }}%)</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:{{ p.1 }}%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            </div>
+          </div>
+          {% endwith %}
+          {% endfor %}
+          <!-- Pure static fallback always shown -->
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.78rem;color:var(--text)">Diesel</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)">92 trips (62%)</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:62%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.78rem;color:var(--text)">Petrol</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)">36 trips (24%)</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:24%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.78rem;color:var(--text)">Bio-Fuel</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)">13 trips (9%)</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:9%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:0.78rem;color:var(--text)">Kerosene</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)">7 trips (5%)</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:5%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/driver.js' %}"></script>
+<script>
+  function filterHistory() {
+    const q     = document.getElementById('historySearch').value.toLowerCase();
+    const month = document.getElementById('monthFilter').value;
+    document.querySelectorAll('#historyTable tbody tr').forEach(row => {
+      const textMatch  = row.textContent.toLowerCase().includes(q);
+      const monthMatch = month === 'all' || !row.dataset.month || row.dataset.month === month;
+      row.style.display = (textMatch && monthMatch) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!-- =====================================================
+     FUELFLOW DRIVER SIDEBAR PARTIAL
+     Usage: {% include 'driver/partials/sidebar.html' with active='dashboard' %}
+     active values: dashboard | available | my_deliveries | history | profile
+     ===================================================== -->
+<aside class="sidebar" id="sidebar">
+
+  <a href="{% url 'driver_dashboard' %}" class="sidebar-brand">
+    <div class="sb-logo"><i class="fas fa-gas-pump"></i></div>
+    <span class="sb-title">Fuel<span>Flow</span></span>
+  </a>
+
+  <!-- Driver info -->
+  <div class="sidebar-driver">
+    <div class="sd-avatar">{{ request.user.first_name.0|default:"D" }}{{ request.user.last_name.0|default:"R" }}</div>
+    <div class="sd-info">
+      <div class="sd-name">{{ request.user.get_full_name|default:"Driver Name" }}</div>
+      <div class="sd-role">Driver</div>
+      <div class="sd-status">
+        <span class="status-dot online" id="sidebarStatusDot"></span>
+        <span id="sidebarStatusLabel" style="color:var(--success);font-size:0.7rem;font-weight:600">Online</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <span class="nav-section-label">Overview</span>
+
+    <a href="{% url 'driver_dashboard' %}" class="nav-item {% if active == 'dashboard' %}active{% endif %}">
+      <i class="fas fa-gauge-high"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <span class="nav-section-label">Deliveries</span>
+
+    <a href="{% url 'available_orders' %}" class="nav-item {% if active == 'available' %}active{% endif %}">
+      <i class="fas fa-inbox"></i>
+      <span>Available Orders</span>
+      <span class="nav-badge blue" id="availableBadge">{{ available_count|default:"4" }}</span>
+    </a>
+
+    <a href="{% url 'my_deliveries' %}" class="nav-item {% if active == 'my_deliveries' %}active{% endif %}">
+      <i class="fas fa-truck-fast"></i>
+      <span>My Deliveries</span>
+      {% if active_delivery_count %}
+        <span class="nav-badge">{{ active_delivery_count }}</span>
+      {% endif %}
+    </a>
+
+    <a href="{% url 'delivery_history' %}" class="nav-item {% if active == 'history' %}active{% endif %}">
+      <i class="fas fa-clock-rotate-left"></i>
+      <span>History</span>
+    </a>
+
+    <span class="nav-section-label">Account</span>
+
+    <a href="{% url 'driver_profile' %}" class="nav-item {% if active == 'profile' %}active{% endif %}">
+      <i class="fas fa-user-circle"></i>
+      <span>My Profile</span>
+    </a>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{% url 'logout' %}" class="nav-item logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Log Out</span>
+    </a>
+  </div>
+
+</aside>

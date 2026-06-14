@@ -1,0 +1,292 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Available Orders</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/driver.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/driversidebar.html' with active='available' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Available Orders</span>
+  </div>
+  <div class="topbar-right">
+    <div class="online-toggle" id="onlineToggle" onclick="toggleOnlineStatus()">
+      <div class="ot-dot" id="otDot"></div>
+      <span class="ot-label" id="otLabel">Online</span>
+    </div>
+    <a href="{% url 'driver_profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ request.user.first_name.0|default:"D" }}{{ request.user.last_name.0|default:"R" }}</div>
+      <span class="tp-name">{{ request.user.first_name|default:"Driver" }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Header row -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+      <h2 style="font-family:var(--font-display);font-size:1.4rem;letter-spacing:0.05em;color:var(--text);margin-bottom:4px">
+        Unclaimed Orders Pool
+      </h2>
+      <p style="font-size:0.83rem;color:var(--text-muted)">
+        {{ available_orders|length|default:"4" }} orders waiting — accept one to begin your delivery.
+      </p>
+    </div>
+    <!-- Filter pills -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-driver btn-sm filter-pill active" data-f="all">All</button>
+      <button class="btn btn-ghost btn-sm filter-pill" data-f="Petrol">Petrol</button>
+      <button class="btn btn-ghost btn-sm filter-pill" data-f="Diesel">Diesel</button>
+      <button class="btn btn-ghost btn-sm filter-pill" data-f="Kerosene">Kerosene</button>
+      <button class="btn btn-ghost btn-sm filter-pill" data-f="Bio-Fuel">Bio-Fuel</button>
+    </div>
+  </div>
+
+  <!-- Info notice -->
+  <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:var(--radius-sm);padding:12px 18px;margin-bottom:22px;display:flex;align-items:center;gap:10px">
+    <i class="fas fa-circle-info" style="color:var(--driver);flex-shrink:0"></i>
+    <span style="font-size:0.82rem;color:var(--text-muted)">
+      You can only have <strong style="color:var(--text)">one active delivery</strong> at a time.
+      Complete your current delivery before accepting a new one.
+    </span>
+  </div>
+
+  <!-- Order cards grid -->
+  <div class="order-cards-grid" id="ordersGrid">
+
+    {% if available_orders %}
+      {% for order in available_orders %}
+      <div class="order-card {% if order.urgent %}urgent{% endif %}" data-fuel="{{ order.fuel_type }}">
+        <div class="order-card-top">
+          <span class="order-card-id">#{{ order.id }}</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            {% if order.urgent %}<span class="urgency-tag"><i class="fas fa-bolt me-1"></i>Urgent</span>{% endif %}
+            <span class="badge badge-available"><i class="fas fa-circle"></i>Open</span>
+          </div>
+        </div>
+        <div class="order-card-body">
+          <div class="oc-detail">
+            <i class="fas fa-gas-pump"></i>
+            <div><strong>Fuel & Quantity</strong><span>{{ order.fuel_type }} — {{ order.quantity }}L</span></div>
+          </div>
+          <div class="oc-detail">
+            <i class="fas fa-location-dot"></i>
+            <div><strong>Delivery Address</strong><span>{{ order.delivery_address }}</span></div>
+          </div>
+          <div class="oc-detail">
+            <i class="fas fa-user"></i>
+            <div><strong>Customer</strong><span>{{ order.customer_name }}</span></div>
+          </div>
+          <div class="oc-detail">
+            <i class="fas fa-clock"></i>
+            <div><strong>Time Slot</strong><span>{{ order.time_slot }}</span></div>
+          </div>
+        </div>
+        <div class="order-card-footer">
+          <button class="btn btn-ghost btn-sm" onclick="openPreviewModal('{{ order.id }}','{{ order.fuel_type }}','{{ order.quantity }}','{{ order.delivery_address }}','{{ order.customer_name }}','{{ order.time_slot }}')">
+            <i class="fas fa-eye"></i> Preview
+          </button>
+          <form method="POST" action="{% url 'accept_order' order.id %}" style="flex:1">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-driver w-100" style="justify-content:center">
+              <i class="fas fa-hand-pointer"></i> Accept Order
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+
+    <!-- Demo cards -->
+    <div class="order-card urgent" data-fuel="Diesel">
+      <div class="order-card-top">
+        <span class="order-card-id">#FF-2045</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="urgency-tag"><i class="fas fa-bolt"></i> Urgent</span>
+          <span class="badge badge-available"><i class="fas fa-circle"></i>Open</span>
+        </div>
+      </div>
+      <div class="order-card-body">
+        <div class="oc-detail"><i class="fas fa-gas-pump"></i><div><strong>Fuel & Quantity</strong><span>Diesel — 300L</span></div></div>
+        <div class="oc-detail"><i class="fas fa-location-dot"></i><div><strong>Delivery Address</strong><span>Site B, Industrial Zone, East District</span></div></div>
+        <div class="oc-detail"><i class="fas fa-user"></i><div><strong>Customer</strong><span>Robert Osei – BuildRight Inc</span></div></div>
+        <div class="oc-detail"><i class="fas fa-clock"></i><div><strong>Time Slot</strong><span>Morning (8AM – 12PM)</span></div></div>
+      </div>
+      <div class="order-card-footer">
+        <button class="btn btn-ghost btn-sm" onclick="openPreviewModal('FF-2045','Diesel','300','Site B, Industrial Zone','Robert Osei','8AM–12PM')">
+          <i class="fas fa-eye"></i> Preview
+        </button>
+        <button class="btn btn-driver" style="flex:1;justify-content:center" onclick="acceptOrder('FF-2045', this)">
+          <i class="fas fa-hand-pointer"></i> Accept Order
+        </button>
+      </div>
+    </div>
+
+    <div class="order-card" data-fuel="Petrol">
+      <div class="order-card-top">
+        <span class="order-card-id">#FF-2046</span>
+        <span class="badge badge-available"><i class="fas fa-circle"></i>Open</span>
+      </div>
+      <div class="order-card-body">
+        <div class="oc-detail"><i class="fas fa-fire-flame-curved"></i><div><strong>Fuel & Quantity</strong><span>Petrol — 100L</span></div></div>
+        <div class="oc-detail"><i class="fas fa-location-dot"></i><div><strong>Delivery Address</strong><span>22 Bloom Street, Northside</span></div></div>
+        <div class="oc-detail"><i class="fas fa-user"></i><div><strong>Customer</strong><span>Anna Peters</span></div></div>
+        <div class="oc-detail"><i class="fas fa-clock"></i><div><strong>Time Slot</strong><span>Afternoon (12PM – 5PM)</span></div></div>
+      </div>
+      <div class="order-card-footer">
+        <button class="btn btn-ghost btn-sm" onclick="openPreviewModal('FF-2046','Petrol','100','22 Bloom Street, Northside','Anna Peters','12PM–5PM')">
+          <i class="fas fa-eye"></i> Preview
+        </button>
+        <button class="btn btn-driver" style="flex:1;justify-content:center" onclick="acceptOrder('FF-2046', this)">
+          <i class="fas fa-hand-pointer"></i> Accept Order
+        </button>
+      </div>
+    </div>
+
+    <div class="order-card" data-fuel="Bio-Fuel">
+      <div class="order-card-top">
+        <span class="order-card-id">#FF-2047</span>
+        <span class="badge badge-available"><i class="fas fa-circle"></i>Open</span>
+      </div>
+      <div class="order-card-body">
+        <div class="oc-detail"><i class="fas fa-leaf"></i><div><strong>Fuel & Quantity</strong><span>Bio-Fuel — 150L</span></div></div>
+        <div class="oc-detail"><i class="fas fa-location-dot"></i><div><strong>Delivery Address</strong><span>7 Green Valley Road, Suburbs</span></div></div>
+        <div class="oc-detail"><i class="fas fa-user"></i><div><strong>Customer</strong><span>Marcus Webb</span></div></div>
+        <div class="oc-detail"><i class="fas fa-clock"></i><div><strong>Time Slot</strong><span>Evening (5PM – 8PM)</span></div></div>
+      </div>
+      <div class="order-card-footer">
+        <button class="btn btn-ghost btn-sm" onclick="openPreviewModal('FF-2047','Bio-Fuel','150','7 Green Valley Road, Suburbs','Marcus Webb','5PM–8PM')">
+          <i class="fas fa-eye"></i> Preview
+        </button>
+        <button class="btn btn-driver" style="flex:1;justify-content:center" onclick="acceptOrder('FF-2047', this)">
+          <i class="fas fa-hand-pointer"></i> Accept Order
+        </button>
+      </div>
+    </div>
+
+    <div class="order-card" data-fuel="Kerosene">
+      <div class="order-card-top">
+        <span class="order-card-id">#FF-2048</span>
+        <span class="badge badge-available"><i class="fas fa-circle"></i>Open</span>
+      </div>
+      <div class="order-card-body">
+        <div class="oc-detail"><i class="fas fa-flask"></i><div><strong>Fuel & Quantity</strong><span>Kerosene — 80L</span></div></div>
+        <div class="oc-detail"><i class="fas fa-location-dot"></i><div><strong>Delivery Address</strong><span>Factory Gate 3, Port Area</span></div></div>
+        <div class="oc-detail"><i class="fas fa-user"></i><div><strong>Customer</strong><span>Harbour Logistics Ltd</span></div></div>
+        <div class="oc-detail"><i class="fas fa-clock"></i><div><strong>Time Slot</strong><span>Morning (8AM – 12PM)</span></div></div>
+      </div>
+      <div class="order-card-footer">
+        <button class="btn btn-ghost btn-sm" onclick="openPreviewModal('FF-2048','Kerosene','80','Factory Gate 3, Port Area','Harbour Logistics Ltd','8AM–12PM')">
+          <i class="fas fa-eye"></i> Preview
+        </button>
+        <button class="btn btn-driver" style="flex:1;justify-content:center" onclick="acceptOrder('FF-2048', this)">
+          <i class="fas fa-hand-pointer"></i> Accept Order
+        </button>
+      </div>
+    </div>
+
+    {% endif %}
+  </div>
+
+</main>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Order Preview &nbsp;<span id="pvOrderId" style="color:var(--primary)"></span></span>
+      <button class="modal-close" onclick="closeModal('previewModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="detail-box">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="detail-row"><span>Fuel Type</span>   <span id="pvFuel"></span></div>
+            <div class="detail-row"><span>Quantity</span>    <span id="pvQty"></span></div>
+            <div class="detail-row"><span>Address</span>     <span id="pvAddr"></span></div>
+            <div class="detail-row"><span>Customer</span>    <span id="pvCust"></span></div>
+            <div class="detail-row"><span>Time Slot</span>   <span id="pvTime"></span></div>
+          </div>
+        </div>
+        <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:var(--radius-sm);padding:14px">
+          <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.55">
+            <i class="fas fa-circle-info" style="color:var(--driver);margin-right:6px"></i>
+            By accepting this order you confirm you are available for this delivery window.
+            You will not be able to accept another order until this one is completed.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('previewModal')">Cancel</button>
+      <button class="btn btn-driver" id="pvAcceptBtn">
+        <i class="fas fa-hand-pointer"></i> Accept This Order
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/driver.js' %}"></script>
+<script>
+  /* Filter pills */
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', function () {
+      document.querySelectorAll('.filter-pill').forEach(p => {
+        p.classList.remove('active');
+        p.className = p.className.replace('btn-driver','btn-ghost');
+      });
+      this.classList.add('active');
+      this.className = this.className.replace('btn-ghost','btn-driver');
+      const f = this.dataset.f;
+      document.querySelectorAll('.order-card').forEach(card => {
+        card.style.display = (f === 'all' || card.dataset.fuel === f) ? '' : 'none';
+      });
+    });
+  });
+
+  /* Preview modal */
+  function openPreviewModal(id, fuel, qty, addr, cust, time) {
+    document.getElementById('pvOrderId').textContent = '#' + id;
+    document.getElementById('pvFuel').textContent = fuel;
+    document.getElementById('pvQty').textContent  = qty + 'L';
+    document.getElementById('pvAddr').textContent = addr;
+    document.getElementById('pvCust').textContent = cust;
+    document.getElementById('pvTime').textContent = time;
+    document.getElementById('pvAcceptBtn').onclick = () => acceptOrder(id);
+    document.getElementById('previewModal').classList.add('active');
+  }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+  /* Accept order (demo — in Django this POSTs to accept_order view) */
+  function acceptOrder(orderId, btn) {
+    closeModal('previewModal');
+    const card = btn ? btn.closest('.order-card') : document.querySelector(`[data-fuel]`);
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Accepting...';
+      btn.disabled = true;
+    }
+    setTimeout(() => {
+      if (card) {
+        card.style.transition = 'all 0.4s ease';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.95)';
+        setTimeout(() => card.remove(), 400);
+      }
+      showDashToast('Order #' + orderId + ' accepted! Check My Deliveries.', 'fa-check-circle', 'var(--success)');
+    }, 800);
+  }
+</script>
+</body>
+</html>
