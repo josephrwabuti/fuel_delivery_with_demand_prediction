@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Notifications</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/customerdashboard.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/customersidebar.html' with active='notifications' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Notifications</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark all read</button>
+    <a href="{% url 'profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+      <span class="tp-name">{{ user.first_name }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <div style="max-width:720px;margin:0 auto">
+
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm notif-tab active" data-tab="all">All</button>
+      <button class="btn btn-ghost btn-sm notif-tab" data-tab="orders">Orders</button>
+      <button class="btn btn-ghost btn-sm notif-tab" data-tab="ai">AI Alerts</button>
+      <button class="btn btn-ghost btn-sm notif-tab" data-tab="system">System</button>
+    </div>
+
+    <!-- Notifications list -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Notifications</span>
+        <span class="badge badge-pending" id="unreadCount">3 Unread</span>
+      </div>
+      <div class="card-body" style="padding:8px 16px">
+        <div class="notif-list" id="notifList">
+
+          <!-- UNREAD -->
+          <div class="notif-item unread" data-category="orders">
+            <div class="ni-icon orange"><i class="fas fa-truck-fast"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Order #FF-2040 is En Route</div>
+              <div class="ni-text">Your driver Carlos M. is on the way with 100L Petrol. Estimated arrival in 12 minutes.</div>
+            </div>
+            <div class="ni-time">2h ago</div>
+          </div>
+
+          <div class="notif-item unread" data-category="ai">
+            <div class="ni-icon blue"><i class="fas fa-brain"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">AI Predicts Low Fuel in 3 Days</div>
+              <div class="ni-text">Based on your usage patterns, your tank will reach critical level by Saturday. Consider scheduling a delivery now.</div>
+            </div>
+            <div class="ni-time">4h ago</div>
+          </div>
+
+          <div class="notif-item unread" data-category="system">
+            <div class="ni-icon yellow"><i class="fas fa-tag"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Weekend Promo – 5% Off Diesel</div>
+              <div class="ni-text">This weekend only: get 5% discount on all Diesel orders above 100L. Use code WEEKEND5 at checkout.</div>
+            </div>
+            <div class="ni-time">6h ago</div>
+          </div>
+
+          <!-- READ -->
+          <div class="notif-item" data-category="orders">
+            <div class="ni-icon green"><i class="fas fa-circle-check"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Order #FF-2041 Delivered Successfully</div>
+              <div class="ni-text">200L Diesel was delivered to 45 Main St. Please rate your experience.</div>
+            </div>
+            <div class="ni-time">Yesterday</div>
+          </div>
+
+          <div class="notif-item" data-category="orders">
+            <div class="ni-icon orange"><i class="fas fa-box"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Order #FF-2041 Confirmed</div>
+              <div class="ni-text">Your order for 200L Diesel has been confirmed. A driver will be assigned shortly.</div>
+            </div>
+            <div class="ni-time">Yesterday</div>
+          </div>
+
+          <div class="notif-item" data-category="ai">
+            <div class="ni-icon blue"><i class="fas fa-chart-line"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Monthly Usage Report Ready</div>
+              <div class="ni-text">Your May 2026 fuel usage report is available. You ordered 320L total — 8% more than April.</div>
+            </div>
+            <div class="ni-time">2 days ago</div>
+          </div>
+
+          <div class="notif-item" data-category="system">
+            <div class="ni-icon green"><i class="fas fa-shield-check"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Account Security Update</div>
+              <div class="ni-text">Your password was changed successfully. If you didn't do this, contact support immediately.</div>
+            </div>
+            <div class="ni-time">5 days ago</div>
+          </div>
+
+          <div class="notif-item" data-category="orders">
+            <div class="ni-icon orange" style="background:rgba(239,68,68,0.12);color:var(--danger)"><i class="fas fa-ban"></i></div>
+            <div class="ni-body">
+              <div class="ni-title">Order #FF-2037 Cancelled</div>
+              <div class="ni-text">Your order was cancelled as requested. Any payment will be refunded within 2–3 business days.</div>
+            </div>
+            <div class="ni-time">1 week ago</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+<script src="{% static 'js/customerdashboard.js' %}"></script>
+<script>
+  /* Tab filter */
+  document.querySelectorAll('.notif-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.notif-tab').forEach(t => {
+        t.classList.remove('active');
+        t.className = t.className.replace('btn-primary','btn-ghost');
+      });
+      this.classList.add('active');
+      this.className = this.className.replace('btn-ghost','btn-primary');
+      const cat = this.dataset.tab;
+      document.querySelectorAll('.notif-item').forEach(item => {
+        item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
+      });
+    });
+  });
+
+  /* Mark all read */
+  function markAllRead() {
+    document.querySelectorAll('.notif-item.unread').forEach(n => n.classList.remove('unread'));
+    document.getElementById('unreadCount').textContent = '0 Unread';
+    document.getElementById('unreadCount').className = 'badge badge-delivered';
+    showDashToast('All notifications marked as read');
+  }
+
+  /* Click to mark single read */
+  document.querySelectorAll('.notif-item').forEach(item => {
+    item.addEventListener('click', function() { this.classList.remove('unread'); });
+  });
+</script>
+</body>
+</html>

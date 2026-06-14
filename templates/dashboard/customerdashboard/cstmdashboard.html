@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – My Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/customerdashboard.css' %}"/>
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+{% include 'partials/customersidebar.html' with active='dashboard' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ===================== TOPBAR ===================== -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'notifications' %}" class="topbar-btn" title="Notifications">
+      <i class="fas fa-bell"></i>
+      <span class="tb-dot"></span>
+    </a>
+    <a href="{% url 'profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+      <span class="tp-name">{{ user.first_name }}</span>
+    </a>
+  </div>
+</div>
+
+<!-- ===================== MAIN ===================== -->
+<main class="main-content">
+
+  <!-- Welcome Banner -->
+  <div class="quick-order-banner">
+    <div class="qob-text">
+      <h3>Good day, {{ user.first_name }}! 👋</h3>
+      <p>Your AI-predicted next delivery is in <strong style="color:white">3 days</strong>. Order early for priority scheduling.</p>
+    </div>
+    <a href="{% url 'new_order' %}" class="qob-btn">
+      <i class="fas fa-truck-fast"></i> Order Fuel Now
+    </a>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">Total Orders</span>
+        <div class="sc-icon orange"><i class="fas fa-box"></i></div>
+      </div>
+      <div class="sc-value">{{ total_orders|default:"24" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 3 this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">Litres Ordered</span>
+        <div class="sc-icon yellow"><i class="fas fa-gas-pump"></i></div>
+      </div>
+      <div class="sc-value">{{ total_litres|default:"1,840" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 120L vs last month</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">Active Orders</span>
+        <div class="sc-icon blue"><i class="fas fa-spinner"></i></div>
+      </div>
+      <div class="sc-value">{{ active_orders|default:"2" }}</div>
+      <div class="sc-change"><i class="fas fa-clock"></i> 1 en route</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-top">
+        <span class="sc-label">Total Spent</span>
+        <div class="sc-icon green"><i class="fas fa-wallet"></i></div>
+      </div>
+      <div class="sc-value">${{ total_spent|default:"2,614" }}</div>
+      <div class="sc-change up"><i class="fas fa-arrow-up"></i> 8% efficiency gain</div>
+    </div>
+  </div>
+
+  <!-- Main Grid: recent orders + side widgets -->
+  <div class="row-7_5" style="gap:20px">
+
+    <!-- Recent Orders -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Orders</span>
+          <a href="{% url 'orders' %}" class="btn btn-ghost btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="table-responsive">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Fuel Type</th>
+                <th>Qty</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if recent_orders %}
+                {% for order in recent_orders %}
+                <tr>
+                  <td><span class="order-id">#{{ order.id }}</span></td>
+                  <td><span class="fuel-type-pill"><i class="fas fa-gas-pump"></i>{{ order.fuel_type }}</span></td>
+                  <td>{{ order.quantity }}L</td>
+                  <td>{{ order.date|date:"M d, Y" }}</td>
+                  <td><span class="badge badge-{{ order.status|lower }}"><i class="fas fa-circle"></i>{{ order.status }}</span></td>
+                </tr>
+                {% endfor %}
+              {% else %}
+              <!-- Static sample data — replace with real Django queryset -->
+              <tr>
+                <td><span class="order-id">#FF-2041</span></td>
+                <td><span class="fuel-type-pill"><i class="fas fa-gas-pump"></i>Diesel</span></td>
+                <td>200L</td>
+                <td>Jun 1, 2026</td>
+                <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
+              </tr>
+              <tr>
+                <td><span class="order-id">#FF-2040</span></td>
+                <td><span class="fuel-type-pill"><i class="fas fa-fire-flame-curved"></i>Petrol</span></td>
+                <td>100L</td>
+                <td>May 28, 2026</td>
+                <td><span class="badge badge-processing"><i class="fas fa-circle"></i>Processing</span></td>
+              </tr>
+              <tr>
+                <td><span class="order-id">#FF-2039</span></td>
+                <td><span class="fuel-type-pill"><i class="fas fa-leaf"></i>Bio-Fuel</span></td>
+                <td>150L</td>
+                <td>May 22, 2026</td>
+                <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
+              </tr>
+              <tr>
+                <td><span class="order-id">#FF-2038</span></td>
+                <td><span class="fuel-type-pill"><i class="fas fa-gas-pump"></i>Diesel</span></td>
+                <td>300L</td>
+                <td>May 15, 2026</td>
+                <td><span class="badge badge-cancelled"><i class="fas fa-circle"></i>Cancelled</span></td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Widgets -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Fuel Gauge -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">AI Prediction</span>
+          <span class="badge badge-processing"><i class="fas fa-brain"></i> Active</span>
+        </div>
+        <div class="card-body">
+          <div class="fuel-gauge-wrap">
+            <svg class="gauge-svg" viewBox="0 0 180 100">
+              <!-- Background arc -->
+              <path class="gauge-arc-bg" d="M 20 90 A 70 70 0 0 1 160 90" />
+              <!-- Fill arc (78% = stroke-dashoffset calculated in JS) -->
+              <path class="gauge-arc-fill" id="gaugeArc" d="M 20 90 A 70 70 0 0 1 160 90"
+                stroke-dasharray="220"
+                stroke-dashoffset="48"/>
+              <text class="gauge-val" x="90" y="72">78%</text>
+              <text class="gauge-label" x="90" y="90">Tank Level</text>
+            </svg>
+          </div>
+          <div class="gauge-info">
+            <p>Estimated depletion</p>
+            <strong>~3 days remaining</strong>
+          </div>
+          <a href="{% url 'new_order' %}" class="btn btn-primary w-100" style="justify-content:center;margin-top:14px">
+            <i class="fas fa-bolt"></i> Auto-Schedule Delivery
+          </a>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Activity</span>
+        </div>
+        <div class="card-body" style="padding:12px 22px">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="ai-dot delivered"></div>
+              <span>200L Diesel delivered</span>
+              <time>2h ago</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot pending"></div>
+              <span>Order #FF-2040 placed</span>
+              <time>5h ago</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot delivered"></div>
+              <span>Profile updated</span>
+              <time>1d ago</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot cancelled"></div>
+              <span>Order #FF-2038 cancelled</span>
+              <time>2d ago</time>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+
+<script src="{% static 'js/customerdashboard.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – My Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/customerdashboard.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/customersidebar.html' with active='profile' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">My Profile</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'notifications' %}" class="topbar-btn"><i class="fas fa-bell"></i><span class="tb-dot"></span></a>
+    <a href="{% url 'profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+      <span class="tp-name">{{ user.first_name }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="ph-avatar" id="profileAvatar">
+      {{ user.first_name.0|default:"J" }}{{ user.last_name.0|default:"D" }}
+    </div>
+    <div class="ph-info">
+      <div class="ph-name">{{ user.get_full_name|default:"James Doe" }}</div>
+      <div class="ph-email">{{ user.email|default:"james@example.com" }}</div>
+      <div class="ph-meta">
+        <span class="ph-tag"><i class="fas fa-calendar-alt"></i> Member since {{ user.date_joined|date:"M Y"|default:"Jan 2024" }}</span>
+        <span class="ph-tag"><i class="fas fa-box"></i> {{ total_orders|default:"24" }} orders</span>
+        <span class="ph-tag"><i class="fas fa-gas-pump"></i> {{ preferred_fuel|default:"Diesel" }} preferred</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-2col" style="gap:20px;align-items:start">
+
+    <!-- Edit Profile Form -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Personal Information</span>
+          <button class="btn btn-ghost btn-sm" id="editToggle" onclick="toggleEdit()">
+            <i class="fas fa-pen"></i> Edit
+          </button>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'update_profile' %}" id="profileForm">
+            {% csrf_token %}
+            <div class="order-form-grid">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-input profile-field"
+                  value="{{ user.first_name|default:'James' }}" readonly/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-input profile-field"
+                  value="{{ user.last_name|default:'Doe' }}" readonly/>
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input profile-field"
+                  value="{{ user.email|default:'james@example.com' }}" readonly/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="phone" class="form-input profile-field"
+                  value="{{ user.phone|default:'+1 555 0100' }}" readonly/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fuel Preference</label>
+                <select name="fuel_preference" class="form-select profile-field" disabled>
+                  <option {% if user.fuel_preference == 'Petrol' %}selected{% endif %}>Petrol</option>
+                  <option {% if user.fuel_preference == 'Diesel' or not user.fuel_preference %}selected{% endif %}>Diesel</option>
+                  <option {% if user.fuel_preference == 'Kerosene' %}selected{% endif %}>Kerosene</option>
+                  <option {% if user.fuel_preference == 'Bio-Fuel' %}selected{% endif %}>Bio-Fuel</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Default Delivery Address</label>
+                <input type="text" name="address" class="form-input profile-field"
+                  value="{{ user.address|default:'45 Main Street, Downtown' }}" readonly/>
+              </div>
+            </div>
+
+            <!-- Save / Cancel buttons (hidden until edit mode) -->
+            <div id="editActions" style="display:none;gap:10px;margin-top:18px;justify-content:flex-end" class="d-flex">
+              <button type="button" class="btn btn-outline" onclick="toggleEdit()">Cancel</button>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Change Password</span>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'change_password' %}" id="pwForm">
+            {% csrf_token %}
+            <div class="order-form-grid">
+              <div class="form-group full">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="current_password" class="form-input" placeholder="••••••••"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" name="new_password" class="form-input" placeholder="••••••••" id="newPw"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" name="confirm_password" class="form-input" placeholder="••••••••" id="confPw"/>
+              </div>
+            </div>
+            <div class="d-flex" style="justify-content:flex-end;margin-top:18px">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-lock"></i> Update Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: stats + danger zone -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Account Stats -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Account Stats</span></div>
+        <div class="card-body" style="padding:16px 22px">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="ai-dot delivered"></div>
+              <span>Total Deliveries</span>
+              <time style="color:var(--text);font-weight:700;font-size:0.9rem">{{ total_orders|default:"24" }}</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot pending"></div>
+              <span>Litres Ordered</span>
+              <time style="color:var(--text);font-weight:700;font-size:0.9rem">{{ total_litres|default:"1,840" }}L</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot delivered"></div>
+              <span>Total Spent</span>
+              <time style="color:var(--accent);font-weight:700;font-size:0.9rem">${{ total_spent|default:"2,614" }}</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot delivered"></div>
+              <span>On-Time Rate</span>
+              <time style="color:var(--success);font-weight:700;font-size:0.9rem">98%</time>
+            </div>
+            <div class="activity-item">
+              <div class="ai-dot pending"></div>
+              <span>Member Since</span>
+              <time style="color:var(--text);font-weight:600;font-size:0.82rem">{{ user.date_joined|date:"M Y"|default:"Jan 2024" }}</time>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Preferences -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Notifications</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+          {% for label in "Delivery updates,AI prediction alerts,Promotions & offers,Account activity"|split:"," %}
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="text-sm" style="color:var(--text)">{{ label }}</span>
+            <label class="toggle-switch">
+              <input type="checkbox" checked/>
+              <span class="ts-track"></span>
+            </label>
+          </div>
+          {% endfor %}
+          <!-- Static fallback if no template tag for split -->
+          <div style="display:flex;justify-content:space-between;align-items:center" class="notif-pref-row">
+            <span class="text-sm" style="color:var(--text)">Delivery updates</span>
+            <label class="toggle-switch"><input type="checkbox" checked/><span class="ts-track"></span></label>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center" class="notif-pref-row">
+            <span class="text-sm" style="color:var(--text)">AI prediction alerts</span>
+            <label class="toggle-switch"><input type="checkbox" checked/><span class="ts-track"></span></label>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center" class="notif-pref-row">
+            <span class="text-sm" style="color:var(--text)">Promotions &amp; offers</span>
+            <label class="toggle-switch"><input type="checkbox"/><span class="ts-track"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="card" style="border-color:rgba(239,68,68,0.15)">
+        <div class="card-header" style="border-color:rgba(239,68,68,0.1)">
+          <span class="card-title" style="color:var(--danger)"><i class="fas fa-triangle-exclamation me-2"></i>Danger Zone</span>
+        </div>
+        <div class="card-body">
+          <p class="text-sm text-muted mb-16">These actions are permanent and cannot be undone.</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <a href="{% url 'logout' %}" class="btn btn-danger w-100" style="justify-content:center">
+              <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+            <button class="btn w-100" style="justify-content:center;background:rgba(239,68,68,0.05);color:var(--danger);border:1.5px solid rgba(239,68,68,0.2);"
+              onclick="if(confirm('Are you sure you want to delete your account? This cannot be undone.')) window.location.href='{% url 'delete_account' %}'">
+              <i class="fas fa-trash"></i> Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- Toggle switch CSS -->
+<style>
+.toggle-switch { position:relative;display:inline-block;width:40px;height:22px; }
+.toggle-switch input { opacity:0;width:0;height:0; }
+.ts-track {
+  position:absolute;inset:0;background:rgba(255,255,255,0.1);
+  border:1px solid var(--border);border-radius:11px;cursor:pointer;transition:all 0.3s;
+}
+.ts-track::before {
+  content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;
+  background:var(--text-muted);border-radius:50%;transition:all 0.3s;
+}
+.toggle-switch input:checked + .ts-track { background:var(--primary);border-color:var(--primary); }
+.toggle-switch input:checked + .ts-track::before { transform:translateX(18px);background:white; }
+/* Hide duplicate rows created by template if/else */
+.notif-pref-row:nth-child(n+5) { display:none; }
+</style>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+
+<script src="{% static 'js/customerdashboard.js' %}"></script>
+<script>
+  let editing = false;
+  function toggleEdit() {
+    editing = !editing;
+    const fields = document.querySelectorAll('.profile-field');
+    const actions = document.getElementById('editActions');
+    const btn = document.getElementById('editToggle');
+    fields.forEach(f => {
+      if (f.tagName === 'SELECT') f.disabled = !editing;
+      else f.readOnly = !editing;
+      f.style.opacity = editing ? '1' : '0.7';
+      f.style.borderColor = editing ? 'var(--primary)' : '';
+    });
+    actions.style.display = editing ? 'flex' : 'none';
+    btn.innerHTML = editing ? '<i class="fas fa-times"></i> Cancel' : '<i class="fas fa-pen"></i> Edit';
+  }
+
+  /* Password match check */
+  document.getElementById('pwForm').addEventListener('submit', function(e) {
+    const np = document.getElementById('newPw').value;
+    const cp = document.getElementById('confPw').value;
+    if (np !== cp) {
+      e.preventDefault();
+      showDashToast('Passwords do not match', 'fa-exclamation-circle', '#ef4444');
+    }
+  });
+</script>
+</body>
+</html>

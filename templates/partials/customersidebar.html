@@ -1,0 +1,69 @@
+<!-- =====================================================
+     FUELFLOW SIDEBAR PARTIAL
+     Usage: {% include 'partials/sidebar.html' with active='dashboard' %}
+     active values: dashboard | orders | new_order | notifications | profile
+     ===================================================== -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <a href="{% url 'dashboard' %}" class="sidebar-brand">
+    <div class="sb-logo"><i class="fas fa-gas-pump"></i></div>
+    <span class="sb-title">Fuel<span>Flow</span></span>
+  </a>
+
+  <!-- User card -->
+  <div class="sidebar-user">
+    <div class="su-avatar">{{ user.first_name.0|default:"J" }}{{ user.last_name.0|default:"D" }}</div>
+    <div class="su-info">
+      <div class="su-name">{{ user.get_full_name|default:"John Doe" }}</div>
+      <div class="su-role">Customer</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+
+    <span class="nav-section-label">Main Menu</span>
+
+    <a href="{% url 'dashboard' %}" class="nav-item {% if active == 'cstmdashboard' %}active{% endif %}">
+      <i class="fas fa-gauge-high"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="{% url 'orders' %}" class="nav-item {% if active == 'orders' %}active{% endif %}">
+      <i class="fas fa-box-open"></i>
+      <span>My Orders</span>
+      {% if active_orders %}
+        <span class="nav-badge">{{ active_orders }}</span>
+      {% endif %}
+    </a>
+
+    <a href="{% url 'new_order' %}" class="nav-item {% if active == 'new_order' %}active{% endif %}">
+      <i class="fas fa-truck-fast"></i>
+      <span>New Order</span>
+    </a>
+
+    <span class="nav-section-label">Account</span>
+
+    <a href="{% url 'notifications' %}" class="nav-item {% if active == 'notifications' %}active{% endif %}">
+      <i class="fas fa-bell"></i>
+      <span>Notifications</span>
+      <span class="nav-badge" id="sidebarNotifBadge">3</span>
+    </a>
+
+    <a href="{% url 'profile' %}" class="nav-item {% if active == 'profile' %}active{% endif %}">
+      <i class="fas fa-user-circle"></i>
+      <span>My Profile</span>
+    </a>
+
+  </nav>
+
+  <!-- Logout -->
+  <div class="sidebar-footer">
+    <a href="{% url 'logout' %}" class="nav-item logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Log Out</span>
+    </a>
+  </div>
+
+</aside>

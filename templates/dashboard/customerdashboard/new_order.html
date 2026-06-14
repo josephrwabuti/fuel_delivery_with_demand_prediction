@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – New Order</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/customerdashboard.css' %}"/>
+</head>
+<body>
+
+{% include 'partials/customersidebar.html' with active='new_order' %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-page-title">New Order</span>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'notifications' %}" class="topbar-btn"><i class="fas fa-bell"></i><span class="tb-dot"></span></a>
+    <a href="{% url 'profile' %}" class="topbar-profile">
+      <div class="tp-avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+      <span class="tp-name">{{ user.first_name }}</span>
+    </a>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <form method="POST" action="{% url 'place_order' %}" id="orderForm">
+    {% csrf_token %}
+    <div class="row-7_5" style="gap:24px;align-items:start">
+
+      <!-- LEFT: Order form -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- Step 1: Fuel Type -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span style="color:var(--primary);font-family:var(--font-display);font-size:1rem;margin-right:8px">01</span>
+              Select Fuel Type
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="fuel-selector">
+              <label class="fuel-option">
+                <input type="radio" name="fuel_type" value="Petrol" checked/>
+                <div class="fuel-option-card">
+                  <i class="fas fa-fire-flame-curved"></i>
+                  <span>Petrol</span>
+                  <span class="fuel-price">$1.42/L</span>
+                </div>
+              </label>
+              <label class="fuel-option">
+                <input type="radio" name="fuel_type" value="Diesel"/>
+                <div class="fuel-option-card">
+                  <i class="fas fa-oil-can"></i>
+                  <span>Diesel</span>
+                  <span class="fuel-price">$1.38/L</span>
+                </div>
+              </label>
+              <label class="fuel-option">
+                <input type="radio" name="fuel_type" value="Kerosene"/>
+                <div class="fuel-option-card">
+                  <i class="fas fa-flask"></i>
+                  <span>Kerosene</span>
+                  <span class="fuel-price">$1.15/L</span>
+                </div>
+              </label>
+              <label class="fuel-option">
+                <input type="radio" name="fuel_type" value="Bio-Fuel"/>
+                <div class="fuel-option-card">
+                  <i class="fas fa-leaf"></i>
+                  <span>Bio-Fuel</span>
+                  <span class="fuel-price">$1.55/L</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Quantity -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span style="color:var(--primary);font-family:var(--font-display);font-size:1rem;margin-right:8px">02</span>
+              Select Quantity
+            </span>
+            <span class="badge badge-processing" id="qtyBadge">100 Litres</span>
+          </div>
+          <div class="card-body">
+            <div class="qty-row">
+              <input type="range" class="qty-slider" id="qtySlider" name="quantity"
+                min="20" max="1000" value="100" step="10"
+                oninput="updateQty(this.value)"/>
+              <div class="qty-display" id="qtyDisplay">100L</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px">
+              <span class="text-sm text-muted">Min: 20L</span>
+              <span class="text-sm text-muted">Max: 1000L</span>
+            </div>
+            <!-- Quick presets -->
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+              <button type="button" class="btn btn-ghost btn-sm qty-preset" data-val="50">50L</button>
+              <button type="button" class="btn btn-ghost btn-sm qty-preset" data-val="100">100L</button>
+              <button type="button" class="btn btn-ghost btn-sm qty-preset" data-val="200">200L</button>
+              <button type="button" class="btn btn-ghost btn-sm qty-preset" data-val="500">500L</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Delivery Details -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span style="color:var(--primary);font-family:var(--font-display);font-size:1rem;margin-right:8px">03</span>
+              Delivery Details
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="order-form-grid">
+              <div class="form-group full">
+                <label class="form-label">Delivery Address</label>
+                <input type="text" name="delivery_address" class="form-input"
+                  placeholder="Enter full delivery address"
+                  value="{{ user.address|default:'' }}" required/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Preferred Date</label>
+                <input type="date" name="delivery_date" class="form-input" required/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Preferred Time Slot</label>
+                <select name="time_slot" class="form-select">
+                  <option value="08:00-12:00">Morning (8AM – 12PM)</option>
+                  <option value="12:00-17:00">Afternoon (12PM – 5PM)</option>
+                  <option value="17:00-20:00">Evening (5PM – 8PM)</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Special Instructions (optional)</label>
+                <textarea name="instructions" class="form-textarea"
+                  placeholder="Gate code, access notes, contact person..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Order Summary -->
+      <div style="position:sticky;top:calc(var(--topbar-h) + 20px)">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Order Summary</span>
+          </div>
+          <div class="card-body">
+            <div class="order-summary">
+              <div class="os-row">
+                <span>Fuel Type</span>
+                <span id="sumFuelType" style="color:var(--text);font-weight:600">Petrol</span>
+              </div>
+              <div class="os-row">
+                <span>Quantity</span>
+                <span id="sumQty" style="color:var(--text);font-weight:600">100 L</span>
+              </div>
+              <div class="os-row">
+                <span>Price per Litre</span>
+                <span id="sumPPL" style="color:var(--text);font-weight:600">$1.42</span>
+              </div>
+              <div class="os-row">
+                <span>Delivery Fee</span>
+                <span style="color:var(--success);font-weight:600">FREE</span>
+              </div>
+              <div class="os-row">
+                <span>Subtotal</span>
+                <span id="sumTotal">$142.00</span>
+              </div>
+            </div>
+
+            <!-- AI tip -->
+            <div style="background:rgba(232,93,4,0.06);border:1px solid rgba(232,93,4,0.15);border-radius:10px;padding:14px;margin-top:16px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fas fa-brain" style="color:var(--primary)"></i>
+                <span style="font-size:0.78rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.08em">AI Tip</span>
+              </div>
+              <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55">
+                Based on your usage, ordering <strong style="color:var(--text)">200L</strong> saves you a second delivery fee this month.
+              </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" style="justify-content:center;margin-top:18px;padding:14px">
+              <i class="fas fa-truck-fast"></i> Confirm Order
+            </button>
+            <a href="{% url 'orders' %}" class="btn btn-outline w-100" style="justify-content:center;margin-top:10px">
+              Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+</main>
+
+<div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
+
+<script src="{% static 'js/customerdashboard.js' %}"></script>
+<script>
+  /* Fuel prices */
+  const prices = { Petrol: 1.42, Diesel: 1.38, Kerosene: 1.15, 'Bio-Fuel': 1.55 };
+
+  function updateSummary() {
+    const fuelInput = document.querySelector('input[name="fuel_type"]:checked');
+    const fuel = fuelInput ? fuelInput.value : 'Petrol';
+    const qty  = parseInt(document.getElementById('qtySlider').value);
+    const ppl  = prices[fuel] || 1.42;
+    const total = (ppl * qty).toFixed(2);
+
+    document.getElementById('sumFuelType').textContent = fuel;
+    document.getElementById('sumQty').textContent      = qty + ' L';
+    document.getElementById('sumPPL').textContent      = '$' + ppl.toFixed(2);
+    document.getElementById('sumTotal').textContent    = '$' + total;
+  }
+
+  function updateQty(val) {
+    document.getElementById('qtyDisplay').textContent = val + 'L';
+    document.getElementById('qtyBadge').textContent   = val + ' Litres';
+    updateSummary();
+  }
+
+  /* Presets */
+  document.querySelectorAll('.qty-preset').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const v = this.dataset.val;
+      document.getElementById('qtySlider').value = v;
+      updateQty(v);
+    });
+  });
+
+  /* Fuel type change */
+  document.querySelectorAll('input[name="fuel_type"]').forEach(r => {
+    r.addEventListener('change', updateSummary);
+  });
+
+  updateSummary();
+
+  /* Set min date to today */
+  document.querySelector('input[name="delivery_date"]').min = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
