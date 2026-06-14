@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 300" width="700" height="300">
+  <defs>
+    <linearGradient id="cab" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e85d04"/>
+      <stop offset="100%" stop-color="#c44e02"/>
+    </linearGradient>
+    <linearGradient id="tnk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a6a85"/>
+      <stop offset="50%" stop-color="#2c3e50"/>
+      <stop offset="100%" stop-color="#1a2a3a"/>
+    </linearGradient>
+    <radialGradient id="wheel" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#555"/>
+      <stop offset="100%" stop-color="#111"/>
+    </radialGradient>
+  </defs>
+  <rect width="700" height="300" fill="transparent"/>
+  <!-- Cab -->
+  <path d="M60 80 Q60 60 80 60 L230 60 L260 80 L260 200 L60 200 Z" fill="url(#cab)"/>
+  <!-- Windshield -->
+  <path d="M70 75 Q70 68 82 68 L200 68 L228 82 L228 155 L70 155 Z" fill="#0d1b2a" opacity="0.85"/>
+  <line x1="149" y1="68" x2="149" y2="155" stroke="#050d14" stroke-width="2.5" opacity="0.5"/>
+  <!-- Cab top detail -->
+  <rect x="60" y="58" width="200" height="8" rx="4" fill="#b84402"/>
+  <!-- Roof lights -->
+  <rect x="90" y="52" width="12" height="8" rx="2" fill="#f4a926"/>
+  <rect x="112" y="52" width="12" height="8" rx="2" fill="#f4a926"/>
+  <rect x="134" y="52" width="12" height="8" rx="2" fill="#f4a926"/>
+  <rect x="156" y="52" width="12" height="8" rx="2" fill="#f4a926"/>
+  <!-- Door -->
+  <rect x="70" y="160" width="100" height="38" rx="4" fill="#d45502" opacity="0.6"/>
+  <rect x="82" y="172" width="28" height="8" rx="4" fill="white" opacity="0.25"/>
+  <!-- Step -->
+  <rect x="60" y="198" width="30" height="8" rx="2" fill="#b84402"/>
+  <!-- Headlight -->
+  <ellipse cx="60" cy="130" rx="10" ry="15" fill="#fff9c4" opacity="0.95"/>
+  <ellipse cx="60" cy="130" rx="7" ry="11" fill="white"/>
+  <!-- Mirror -->
+  <rect x="40" y="88" width="14" height="22" rx="4" fill="#b84402"/>
+  <rect x="36" y="90" width="6" height="18" rx="2" fill="#999"/>
+  <!-- Bumper -->
+  <rect x="40" y="188" width="25" height="16" rx="4" fill="#b84402"/>
+  <!-- Exhaust -->
+  <rect x="240" y="30" width="14" height="50" rx="5" fill="#555"/>
+  <ellipse cx="247" cy="30" rx="9" ry="5" fill="#777" opacity="0.6"/>
+  <!-- Smoke -->
+  <circle cx="247" cy="20" r="9" fill="#bbb" opacity="0.13"/>
+  <circle cx="252" cy="10" r="12" fill="#aaa" opacity="0.09"/>
+  <!-- TANKER -->
+  <rect x="255" y="70" width="420" height="145" rx="70" fill="url(#tnk)"/>
+  <!-- Tanker shine top -->
+  <ellipse cx="465" cy="88" rx="170" ry="18" fill="white" opacity="0.08"/>
+  <!-- Tanker rings -->
+  <rect x="350" y="70" width="6" height="145" fill="#0a1520" opacity="0.4"/>
+  <rect x="460" y="70" width="6" height="145" fill="#0a1520" opacity="0.4"/>
+  <rect x="570" y="70" width="6" height="145" fill="#0a1520" opacity="0.4"/>
+  <!-- Company name on tanker -->
+  <text x="465" y="148" font-family="Arial Black, sans-serif" font-size="22" font-weight="900" fill="white" opacity="0.9" text-anchor="middle" letter-spacing="3">FUELFLOW</text>
+  <rect x="350" y="155" width="230" height="3" fill="#e85d04" rx="2" x="350"/>
+  <text x="465" y="168" font-family="Arial, sans-serif" font-size="10" fill="#f4a926" opacity="0.8" text-anchor="middle" letter-spacing="2">SMART FUEL DELIVERY</text>
+  <!-- Hazard diamond -->
+  <rect x="610" y="95" width="40" height="40" rx="3" fill="#e85d04" transform="rotate(45 630 115)"/>
+  <text x="630" y="118" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold" text-anchor="middle">⛽</text>
+  <!-- Valve/pipe -->
+  <rect x="670" y="140" width="25" height="12" rx="4" fill="#2c3e50"/>
+  <circle cx="695" cy="146" r="8" fill="#1a2a3a" stroke="#e85d04" stroke-width="2"/>
+  <!-- WHEELS -->
+  <!-- Front wheel -->
+  <circle cx="160" cy="230" r="50" fill="#111"/>
+  <circle cx="160" cy="230" r="38" fill="#1e1e1e"/>
+  <circle cx="160" cy="230" r="20" fill="#333"/>
+  <circle cx="160" cy="230" r="8" fill="#888"/>
+  <!-- Tire tread marks -->
+  <circle cx="160" cy="230" r="44" fill="none" stroke="#333" stroke-width="4" stroke-dasharray="8,8"/>
+  <!-- Rear wheels (dual) -->
+  <circle cx="440" cy="230" r="50" fill="#111"/>
+  <circle cx="440" cy="230" r="38" fill="#1e1e1e"/>
+  <circle cx="440" cy="230" r="20" fill="#333"/>
+  <circle cx="440" cy="230" r="8" fill="#888"/>
+  <circle cx="440" cy="230" r="44" fill="none" stroke="#333" stroke-width="4" stroke-dasharray="8,8"/>
+  <circle cx="480" cy="230" r="50" fill="#0f0f0f"/>
+  <circle cx="480" cy="230" r="38" fill="#1a1a1a"/>
+  <circle cx="480" cy="230" r="44" fill="none" stroke="#2a2a2a" stroke-width="4" stroke-dasharray="8,8"/>
+  <!-- Rear tanker wheels -->
+  <circle cx="580" cy="230" r="50" fill="#111"/>
+  <circle cx="580" cy="230" r="38" fill="#1e1e1e"/>
+  <circle cx="580" cy="230" r="20" fill="#333"/>
+  <circle cx="580" cy="230" r="8" fill="#888"/>
+  <circle cx="580" cy="230" r="44" fill="none" stroke="#333" stroke-width="4" stroke-dasharray="8,8"/>
+  <!-- Axle connectors -->
+  <rect x="250" y="215" width="200" height="12" rx="4" fill="#1a2a3a"/>
+  <rect x="460" y="215" width="135" height="12" rx="4" fill="#1a2a3a"/>
+  <!-- Mud flaps -->
+  <rect x="205" y="198" width="12" height="40" rx="2" fill="#333"/>
+  <rect x="535" y="198" width="12" height="40" rx="2" fill="#333"/>
+  <!-- Shadow -->
+  <ellipse cx="380" cy="285" rx="320" ry="12" fill="black" opacity="0.18"/>
+</svg>

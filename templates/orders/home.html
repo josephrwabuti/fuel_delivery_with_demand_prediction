@@ -1,0 +1,841 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuelFlow – Smart Online Fuel Delivery</title>
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+      <img src="{% static 'images/logo.svg' %}" alt="FuelFlow Logo" height="40"/>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#prediction">AI Prediction</a></li>
+        <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        <li class="nav-item ms-2"><a class="btn btn-order" href="#contact">Order Fuel</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section class="hero-section" id="home">
+  <!-- Hero background image -->
+  <div class="hero-bg-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-particles" id="particles"></div>
+  <div class="container hero-content">
+    <div class="row align-items-center min-vh-100 py-5">
+      <div class="col-lg-7" data-aos="fade-right">
+        <div class="hero-badge"><i class="fas fa-bolt me-2"></i>AI-Powered Fuel Intelligence</div>
+        <h1 class="hero-title">
+          Smart Fuel<br/>
+          <span class="hero-accent">Delivery</span><br/>
+          At Your Door
+        </h1>
+        <p class="hero-sub">
+          Never run out of fuel again. FuelFlow uses cutting-edge AI demand prediction to ensure your fuel arrives exactly when you need it — before you even ask.
+        </p>
+        <div class="d-flex flex-wrap gap-3 mb-5">
+          <a href="#contact" class="btn btn-hero-primary"><i class="fas fa-truck-fast me-2"></i>Order Now</a>
+          <a href="#prediction" class="btn btn-hero-outline"><i class="fas fa-brain me-2"></i>See AI Prediction</a>
+        </div>
+        <div class="hero-stats d-flex flex-wrap gap-4">
+          <div class="stat-item">
+            <div><span class="stat-number" data-count="12000">0</span><span class="stat-suffix">+</span></div>
+            <span class="stat-label">Deliveries Made</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div><span class="stat-number" data-count="98">0</span><span class="stat-suffix">%</span></div>
+            <span class="stat-label">On-Time Rate</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div><span class="stat-number" data-count="5000">0</span><span class="stat-suffix">+</span></div>
+            <span class="stat-label">Happy Customers</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-flex justify-content-center align-items-center" data-aos="fade-left">
+        <div class="hero-card-wrap">
+          <!-- Live Tracking Card -->
+          <div class="fuel-card">
+            <div class="fuel-card-header">
+              <span><i class="fas fa-location-dot me-2"></i>Live Delivery Tracking</span>
+              <span class="live-badge"><i class="fas fa-circle me-1"></i>LIVE</span>
+            </div>
+            <div class="fuel-card-body">
+              <!-- Map visual -->
+              <div class="mini-map-wrap mb-3">
+                <img src="{% static 'images/map-delivery.svg' %}" alt="Delivery Map" class="mini-map-img"/>
+              </div>
+              <div class="delivery-info">
+                <div class="di-row"><span><i class="fas fa-clock me-2 text-accent"></i>ETA</span><strong>8 minutes</strong></div>
+                <div class="di-row"><span><i class="fas fa-gas-pump me-2 text-accent"></i>Fuel Type</span><strong>Premium Diesel</strong></div>
+                <div class="di-row"><span><i class="fas fa-user me-2 text-accent"></i>Driver</span><strong>Carlos M. ⭐ 4.9</strong></div>
+              </div>
+            </div>
+            <div class="fuel-card-footer">
+              <div class="progress-track">
+                <div class="track-step done"><i class="fas fa-check"></i></div>
+                <div class="track-line done"></div>
+                <div class="track-step done"><i class="fas fa-check"></i></div>
+                <div class="track-line active"></div>
+                <div class="track-step active pulse-step"><i class="fas fa-truck"></i></div>
+                <div class="track-line"></div>
+                <div class="track-step"><i class="fas fa-home"></i></div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small>Ordered</small><small>Confirmed</small><small>En Route</small><small>Delivered</small>
+              </div>
+            </div>
+          </div>
+          <!-- AI badge -->
+          <div class="hero-ai-badge" data-aos="zoom-in" data-aos-delay="400">
+            <i class="fas fa-brain"></i>
+            <div><strong>AI Predicted</strong><span>Next delivery in 3 days</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-down"><a href="#about"><i class="fas fa-chevron-down"></i></a></div>
+</section>
+
+<!-- ========== TRUCK IMAGE SECTION ========== -->
+<div class="truck-showcase">
+  <div class="truck-showcase-inner">
+    <img src="{% static 'images/Fueltanker.jpg' %}" alt="FuelFlow Fuel Delivery Truck" class="truck-img"/>
+    <div class="truck-badges">
+      <span class="tb"><i class="fas fa-shield-halved me-1"></i>Certified Safe</span>
+      <span class="tb"><i class="fas fa-leaf me-1"></i>Eco Fleet</span>
+      <span class="tb"><i class="fas fa-satellite-dish me-1"></i>GPS Tracked</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MARQUEE STRIP ========== -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span><i class="fas fa-gas-pump"></i> Fast Delivery</span>
+    <span><i class="fas fa-brain"></i> AI Demand Prediction</span>
+    <span><i class="fas fa-shield-halved"></i> 100% Safe &amp; Secure</span>
+    <span><i class="fas fa-clock"></i> 24/7 Service</span>
+    <span><i class="fas fa-leaf"></i> Eco Fleet</span>
+    <span><i class="fas fa-mobile-screen"></i> Mobile App</span>
+    <span><i class="fas fa-chart-line"></i> Usage Analytics</span>
+    <span><i class="fas fa-truck-fast"></i> 60-Minute Delivery</span>
+    <span><i class="fas fa-gas-pump"></i> Fast Delivery</span>
+    <span><i class="fas fa-brain"></i> AI Demand Prediction</span>
+    <span><i class="fas fa-shield-halved"></i> 100% Safe &amp; Secure</span>
+    <span><i class="fas fa-clock"></i> 24/7 Service</span>
+    <span><i class="fas fa-leaf"></i> Eco Fleet</span>
+    <span><i class="fas fa-mobile-screen"></i> Mobile App</span>
+    <span><i class="fas fa-chart-line"></i> Usage Analytics</span>
+    <span><i class="fas fa-truck-fast"></i> 60-Minute Delivery</span>
+  </div>
+</div>
+
+<!-- ========== ABOUT ========== -->
+<section class="about-section section-pad" id="about">
+  <div class="container">
+
+    <!--
+      ============================================================
+      ABOUT SECTION – ROW 1 (image + text): NO CHANGE
+      This two-column row (image left, text right) is unchanged.
+      ============================================================
+    -->
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6" data-aos="fade-right">
+        <div class="about-image-wrap">
+          <img src="{% static 'images/about-img.svg' %}" alt="FuelFlow Delivery Operations" class="about-main-img"/>
+          <div class="about-badge-card">
+            <i class="fas fa-award"></i>
+            <div>
+              <strong>Industry Leader</strong>
+              <span>Trusted Since 2019</span>
+            </div>
+          </div>
+          <div class="about-stat-pill">
+            <i class="fas fa-truck-fast me-2"></i>
+            <span><strong>12,000+</strong> deliveries completed</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left">
+        <div class="section-label">About FuelFlow</div>
+        <h2 class="section-title">Revolutionizing How <span class="text-accent">Fuel</span> Reaches You</h2>
+        <p class="section-body">FuelFlow was built to eliminate the frustration of running out of fuel. We combine real-time GPS tracking, machine learning demand forecasting, and a dedicated fleet of certified delivery professionals to bring fuel directly to your home, office, or vehicle.</p>
+        <p class="section-body">Our AI engine analyzes your usage patterns, weather, traffic, and regional consumption trends to predict your needs — sometimes before you realize them yourself.</p>
+        <a href="#services" class="btn btn-primary-custom mt-4"><i class="fas fa-arrow-right me-2"></i>Explore Our Services</a>
+      </div>
+    </div>
+
+    <!--
+      ============================================================
+      ABOUT SECTION – ROW 2: FEATURE CARDS (CHANGED)
+      ------------------------------------------------------------
+      PREVIOUSLY: The 3 feature cards (.about-feature-item) were
+        stacked vertically inside the right col-lg-6 column above,
+        one card below the other. They only occupied half the page width.
+
+      CHANGED TO: The 3 cards are now pulled OUT of the right column
+        and placed in their own full-width row below, using Bootstrap
+        col-lg-4 so each card takes exactly one-third of the page —
+        all 3 sitting side by side: LEFT | MIDDLE | RIGHT.
+
+      TO REVERT: Delete this entire row and move the 3 .about-feature-item
+        divs back inside the col-lg-6 above, wrapped in:
+        <div class="about-features mt-4"> ... </div>
+      ============================================================
+    -->
+    <div class="row g-4 mt-4">
+
+      <!-- Feature card 1 of 3 — LEFT -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="about-feature-item">
+          <div class="af-icon"><i class="fas fa-route"></i></div>
+          <div><strong>Real-Time GPS Tracking</strong><span>Follow your delivery every step of the way on our live map</span></div>
+        </div>
+      </div>
+
+      <!-- Feature card 2 of 3 — MIDDLE -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="about-feature-item">
+          <div class="af-icon"><i class="fas fa-brain"></i></div>
+          <div><strong>Predictive AI Engine</strong><span>Smart ML-powered forecasting for zero fuel disruptions</span></div>
+        </div>
+      </div>
+
+      <!-- Feature card 3 of 3 — RIGHT -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="about-feature-item">
+          <div class="af-icon"><i class="fas fa-certificate"></i></div>
+          <div><strong>Certified &amp; Fully Insured</strong><span>Compliant with all fuel safety regulations and standards</span></div>
+        </div>
+      </div>
+
+    </div><!-- /ROW 2 feature cards -->
+
+  </div>
+</section>
+
+<!-- ========== SERVICES ========== -->
+<!--
+  ============================================================
+  SERVICES SECTION – CARDS ALIGNMENT
+  ------------------------------------------------------------
+  PREVIOUSLY: All 6 cards were in one flat <div class="row g-4">
+    with col-lg-4 col-md-6 on each. Bootstrap wraps them
+    automatically — BUT because col-md-6 was set, on medium
+    screens only 2 cards appeared per row, making the layout
+    inconsistent between screen sizes.
+
+  CHANGED TO: Two explicit rows of 3 cards each.
+    ROW 1 → cards 1, 2, 3 side by side (left | middle | right)
+    ROW 2 → cards 4, 5, 6 side by side (left | middle | right)
+    col-md-4 is now used on all breakpoints so 3 cards always
+    align in a row from medium screens upwards.
+
+  TO REVERT: Merge both rows back into one <div class="row g-4">
+    and change col-md-4 back to col-md-6 if you prefer 2-per-row
+    on tablets.
+  ============================================================
+-->
+<section class="services-section section-pad" id="services">
+  <div class="services-bg-shape"></div>
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <div class="section-label mx-auto">What We Offer</div>
+      <h2 class="section-title">Our <span class="text-accent">Services</span></h2>
+      <p class="section-sub">Comprehensive fuel solutions tailored for every need — residential, commercial &amp; industrial</p>
+    </div>
+
+    <!-- SERVICES ROW 1: Cards 1, 2, 3 — LEFT | MIDDLE | RIGHT -->
+    <div class="row g-2 mb-2">
+
+      <!-- Card 1 of 6 — LEFT -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="service-card">
+          <div class="sc-icon"><i class="fas fa-truck-fast"></i></div>
+          <h4>On-Demand Delivery</h4>
+          <p>Order fuel instantly and have it delivered within the hour. Available 24/7 including weekends and public holidays.</p>
+          <ul class="sc-list"><li>60-minute delivery guarantee</li><li>Live driver tracking</li><li>Digital receipt &amp; invoice</li></ul>
+          <a href="#contact" class="sc-link">Get Started <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+      <!-- Card 2 of 6 — MIDDLE -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="service-card featured">
+          <div class="sc-featured-badge"><i class="fas fa-star me-1"></i>Most Popular</div>
+          <div class="sc-icon"><i class="fas fa-brain"></i></div>
+          <h4>AI Demand Prediction</h4>
+          <p>Our ML model predicts your fuel needs based on usage history, seasons, and consumption trends automatically.</p>
+          <ul class="sc-list"><li>95%+ prediction accuracy</li><li>Auto-schedule deliveries</li><li>Never run empty again</li></ul>
+          <a href="#prediction" class="sc-link">See How It Works <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+      <!-- Card 3 of 6 — RIGHT -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="service-card">
+          <div class="sc-icon"><i class="fas fa-calendar-check"></i></div>
+          <h4>Scheduled Delivery</h4>
+          <p>Set up recurring deliveries on your preferred schedule. Weekly, bi-weekly, or monthly — you choose the frequency.</p>
+          <ul class="sc-list"><li>Flexible schedule control</li><li>Priority queue access</li><li>Locked-in pricing</li></ul>
+          <a href="#contact" class="sc-link">Schedule Now <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+    </div><!-- /SERVICES ROW 1 -->
+
+    <!-- SERVICES ROW 2: Cards 4, 5, 6 — LEFT | MIDDLE | RIGHT -->
+    <div class="row g-2">
+
+      <!-- Card 4 of 6 — LEFT -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="service-card">
+          <div class="sc-icon"><i class="fas fa-industry"></i></div>
+          <h4>Commercial Fleet Fueling</h4>
+          <p>Bulk fuel supply for business fleets, construction sites, generators, and large-scale industrial operations.</p>
+          <ul class="sc-list"><li>Bulk discounts available</li><li>Fleet management portal</li><li>Dedicated account manager</li></ul>
+          <a href="#contact" class="sc-link">Get a Quote <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+      <!-- Card 5 of 6 — MIDDLE -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="service-card">
+          <div class="sc-icon"><i class="fas fa-chart-line"></i></div>
+          <h4>Usage Analytics</h4>
+          <p>Detailed consumption reports and insights via your personal dashboard. Optimize usage and cut fuel costs.</p>
+          <ul class="sc-list"><li>Real-time dashboards</li><li>Cost optimization reports</li><li>Export data as CSV/PDF</li></ul>
+          <a href="#contact" class="sc-link">View Dashboard <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+      <!-- Card 6 of 6 — RIGHT -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="service-card">
+          <div class="sc-icon"><i class="fas fa-leaf"></i></div>
+          <h4>Eco-Friendly Options</h4>
+          <p>Choose cleaner bio-fuel alternatives and track your carbon footprint with our integrated eco reporting module.</p>
+          <ul class="sc-list"><li>B20/B50 bio-blend options</li><li>Carbon offset tracking</li><li>Green fleet certification</li></ul>
+          <a href="#contact" class="sc-link">Go Green <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+    </div><!-- /SERVICES ROW 2 -->
+
+  </div>
+</section>
+
+<!-- ========== AI PREDICTION ========== -->
+<section class="prediction-section section-pad" id="prediction">
+  <div class="prediction-bg-img"></div>
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6" data-aos="fade-right">
+        <div class="section-label">Powered by Machine Learning</div>
+        <h2 class="section-title" style="color:white">Fuel Demand <span class="text-accent">Prediction</span> Engine</h2>
+        <p class="section-body" style="color:rgba(255,255,255,0.65)">FuelFlow's AI core processes thousands of data points — historical usage, time-of-year patterns, local weather, regional demand signals, and vehicle data — to forecast your fuel needs with up to 95% accuracy.</p>
+        <div class="prediction-features">
+          <div class="pf-item">
+            <div class="pf-num">01</div>
+            <div><strong>Data Collection</strong><p>Usage patterns, vehicle type, location, and consumption rates are securely collected and anonymized.</p></div>
+          </div>
+          <div class="pf-item">
+            <div class="pf-num">02</div>
+            <div><strong>AI Model Processing</strong><p>Our trained regression model runs inference against historical + real-time data streams every hour.</p></div>
+          </div>
+          <div class="pf-item">
+            <div class="pf-num">03</div>
+            <div><strong>Proactive Scheduling</strong><p>Deliveries are auto-scheduled before your tank reaches critical level. No app interaction needed.</p></div>
+          </div>
+        </div>
+        <div class="ai-accuracy-bar mt-4">
+          <div class="d-flex justify-content-between mb-1">
+            <span style="color:rgba(255,255,255,0.7);font-size:0.85rem">Model Accuracy</span>
+            <span style="color:var(--accent);font-weight:700">95.2%</span>
+          </div>
+          <div class="acc-track"><div class="acc-fill" id="accFill"></div></div>
+        </div>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left">
+        <div class="ai-dashboard">
+          <div class="ai-dash-header">
+            <span><i class="fas fa-microchip me-2"></i>AI Prediction Dashboard</span>
+            <span class="ai-live-badge"><i class="fas fa-circle me-1" style="font-size:0.5rem"></i>LIVE MODEL</span>
+          </div>
+          <div class="ai-dash-body">
+            <div class="ai-chart-label">Weekly Demand Forecast (Litres)</div>
+            <div class="ai-bars" id="aiBars">
+              <div class="ai-bar-group">
+                <div class="ai-bar actual" data-h="60"><span>240L</span></div>
+                <div class="ai-bar predicted" data-h="65"></div>
+                <div class="ai-bar-label">Mon</div>
+              </div>
+              <div class="ai-bar-group">
+                <div class="ai-bar actual" data-h="75"><span>300L</span></div>
+                <div class="ai-bar predicted" data-h="72"></div>
+                <div class="ai-bar-label">Tue</div>
+              </div>
+              <div class="ai-bar-group">
+                <div class="ai-bar actual" data-h="50"><span>200L</span></div>
+                <div class="ai-bar predicted" data-h="55"></div>
+                <div class="ai-bar-label">Wed</div>
+              </div>
+              <div class="ai-bar-group">
+                <div class="ai-bar actual" data-h="85"><span>340L</span></div>
+                <div class="ai-bar predicted" data-h="88"></div>
+                <div class="ai-bar-label">Thu</div>
+              </div>
+              <div class="ai-bar-group">
+                <div class="ai-bar actual" data-h="90"><span>360L</span></div>
+                <div class="ai-bar predicted" data-h="92"></div>
+                <div class="ai-bar-label">Fri</div>
+              </div>
+              <div class="ai-bar-group">
+                <div class="ai-bar predicted-only" data-h="70"><span>280L</span></div>
+                <div class="ai-bar-label">Sat<br/><small>(pred)</small></div>
+              </div>
+              <div class="ai-bar-group">
+                <div class="ai-bar predicted-only" data-h="55"><span>220L</span></div>
+                <div class="ai-bar-label">Sun<br/><small>(pred)</small></div>
+              </div>
+            </div>
+            <div class="ai-legend d-flex gap-4 mt-2">
+              <span><span class="legend-dot actual-dot"></span> Actual</span>
+              <span><span class="legend-dot predicted-dot"></span> Predicted</span>
+              <span><span class="legend-dot future-dot"></span> Forecast</span>
+            </div>
+            <div class="ai-metrics d-flex gap-3 mt-3 flex-wrap">
+              <div class="ai-metric"><span class="ai-metric-val">95.2%</span><span class="ai-metric-label">Model Accuracy</span></div>
+              <div class="ai-metric"><span class="ai-metric-val">1,940L</span><span class="ai-metric-label">Week Forecast</span></div>
+              <div class="ai-metric"><span class="ai-metric-val text-success-light">↓ 8%</span><span class="ai-metric-label">vs Last Week</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HOW IT WORKS ========== -->
+<!--
+  ============================================================
+  HOW IT WORKS – CARDS ALIGNMENT
+  ------------------------------------------------------------
+  PREVIOUSLY: 4 cards using col-lg-3 col-md-6. On large screens
+    all 4 sat in one row correctly BUT on medium screens they
+    wrapped to 2 rows of 2 (because col-md-6 = 50% width each).
+    The arrow connectors (col-auto) also only showed on lg screens.
+
+  CHANGED TO: All 4 cards now use col-lg-3 col-md-3, so they
+    always sit 4-in-a-row from medium screens upward:
+    [01 Create] [02 Order] [03 Track] [04 Fueled Up]
+    The connector arrows are kept between each card on large screens.
+
+  TO REVERT: Change col-md-3 back to col-md-6 on each card column.
+  ============================================================
+-->
+<section class="how-section section-pad" id="how-it-works">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <div class="section-label mx-auto">Simple Process</div>
+      <h2 class="section-title">How <span class="text-accent">FuelFlow</span> Works</h2>
+      <p class="section-sub">Get fuel delivered in 4 simple steps — no hassle, no waiting at a station</p>
+    </div>
+
+    <!-- 4 cards in one row: LEFT | MIDDLE-LEFT | MIDDLE-RIGHT | RIGHT -->
+    <div class="row g-4 justify-content-center align-items-stretch">
+
+      <!-- Step 01 — LEFT -->
+      <!-- PREVIOUSLY: col-lg-3 col-md-6 (wrapped to 2-per-row on tablets) -->
+      <!-- CHANGED TO: col-lg-3 col-md-3 (stays 4-per-row from medium up) -->
+      <div class="col-lg-3 col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="how-card h-100">
+          <div class="how-step">01</div>
+          <div class="how-icon"><i class="fas fa-user-plus"></i></div>
+          <h5>Create Account</h5>
+          <p>Sign up free and enter your vehicle details, fuel type preferences, and delivery address.</p>
+        </div>
+      </div>
+
+      <!-- Arrow connector — desktop only, no change -->
+      <div class="col-auto d-none d-lg-flex align-items-center"><div class="how-connector"><i class="fas fa-chevron-right"></i></div></div>
+
+      <!-- Step 02 — MIDDLE LEFT -->
+      <div class="col-lg-3 col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="how-card h-100">
+          <div class="how-step">02</div>
+          <div class="how-icon"><i class="fas fa-mobile-screen-button"></i></div>
+          <h5>Place Order</h5>
+          <p>Request fuel on-demand or let our AI auto-schedule based on your predicted consumption pattern.</p>
+        </div>
+      </div>
+
+      <!-- Arrow connector — desktop only, no change -->
+      <div class="col-auto d-none d-lg-flex align-items-center"><div class="how-connector"><i class="fas fa-chevron-right"></i></div></div>
+
+      <!-- Step 03 — MIDDLE RIGHT -->
+      <div class="col-lg-3 col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="how-card h-100">
+          <div class="how-step">03</div>
+          <div class="how-icon"><i class="fas fa-truck-fast"></i></div>
+          <h5>Track Delivery</h5>
+          <p>Monitor your driver's real-time GPS location on the live map and receive ETA notifications.</p>
+        </div>
+      </div>
+
+      <!-- Arrow connector — desktop only, no change -->
+      <div class="col-auto d-none d-lg-flex align-items-center"><div class="how-connector"><i class="fas fa-chevron-right"></i></div></div>
+
+      <!-- Step 04 — RIGHT -->
+      <div class="col-lg-3 col-md-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="how-card h-100">
+          <div class="how-step">04</div>
+          <div class="how-icon"><i class="fas fa-circle-check"></i></div>
+          <h5>Fueled Up!</h5>
+          <p>Receive your fuel safely, get your digital receipt, and rate your delivery experience.</p>
+        </div>
+      </div>
+
+    </div><!-- /4-card row -->
+
+    <!-- Truck illustration — no change -->
+    
+  </div>
+</section>
+
+<!-- ========== FUEL TYPES ========== -->
+<!--
+  ============================================================
+  FUEL TYPES – CARDS ALIGNMENT
+  ------------------------------------------------------------
+  PREVIOUSLY: 4 cards with col-lg-3 col-md-6. On medium screens
+    col-md-6 caused 2 cards per row (Petrol+Diesel on row 1,
+    Kerosene+Bio-Fuel on row 2) which was uneven alignment.
+
+  CHANGED TO: col-lg-3 col-md-3 on every card so all 4 cards
+    always sit side by side in ONE row:
+    [Petrol] [Diesel] [Kerosene] [Bio-Fuel]
+
+  TO REVERT: Change col-md-3 back to col-md-6 on all 4 cards.
+  ============================================================
+-->
+<section class="fuel-types-section section-pad">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <div class="section-label mx-auto">Available Products</div>
+      <h2 class="section-title">Fuel <span class="text-accent">Types</span> We Deliver</h2>
+      <p class="section-sub">We deliver all major fuel types directly to your location with quality certification</p>
+    </div>
+
+    <!-- 4 fuel type cards in one row: LEFT | MID-LEFT | MID-RIGHT | RIGHT -->
+    <div class="row g-4">
+
+      <!-- Petrol — LEFT -->
+      <!-- PREVIOUSLY: col-lg-3 col-md-6 | CHANGED TO: col-lg-3 col-md-3 -->
+      <div class="col-lg-3 col-md-3" data-aos="zoom-in" data-aos-delay="100">
+        <div class="fuel-type-card">
+          <div class="ft-icon petrol"><i class="fas fa-fire-flame-curved"></i></div>
+          <h5>Petrol</h5>
+          <p>Regular and premium unleaded petrol for all petrol-powered vehicles and machinery.</p>
+          <div class="ft-badge">RON 91 · RON 95 · RON 98</div>
+          <div class="ft-price">From $1.42/L</div>
+        </div>
+      </div>
+
+      <!-- Diesel — MIDDLE LEFT -->
+      <!-- PREVIOUSLY: col-lg-3 col-md-6 | CHANGED TO: col-lg-3 col-md-3 -->
+      <div class="col-lg-3 col-md-3" data-aos="zoom-in" data-aos-delay="200">
+        <div class="fuel-type-card featured-fuel">
+          <div class="ft-popular">Most Ordered</div>
+          <div class="ft-icon diesel"><i class="fas fa-oil-can"></i></div>
+          <h5>Diesel</h5>
+          <p>Standard and premium diesel for trucks, SUVs, vans, and commercial vehicles.</p>
+          <div class="ft-badge">Euro 5 · Euro 6 · Premium</div>
+          <div class="ft-price">From $1.38/L</div>
+        </div>
+      </div>
+
+      <!-- Kerosene — MIDDLE RIGHT -->
+      <!-- PREVIOUSLY: col-lg-3 col-md-6 | CHANGED TO: col-lg-3 col-md-3 -->
+      <div class="col-lg-3 col-md-3" data-aos="zoom-in" data-aos-delay="300">
+        <div class="fuel-type-card">
+          <div class="ft-icon kerosene"><i class="fas fa-flask"></i></div>
+          <h5>Kerosene</h5>
+          <p>Aviation grade and household kerosene for heating, turbines, and industrial use.</p>
+          <div class="ft-badge">Jet-A1 · 28-sec · 35-sec</div>
+          <div class="ft-price">From $1.15/L</div>
+        </div>
+      </div>
+
+      <!-- Bio-Fuel — RIGHT -->
+      <!-- PREVIOUSLY: col-lg-3 col-md-6 | CHANGED TO: col-lg-3 col-md-3 -->
+      <div class="col-lg-3 col-md-3" data-aos="zoom-in" data-aos-delay="400">
+        <div class="fuel-type-card">
+          <div class="ft-icon biofuel"><i class="fas fa-leaf"></i></div>
+          <h5>Bio-Fuel</h5>
+          <p>Sustainable blended bio-fuels for eco-conscious drivers and green-certified fleets.</p>
+          <div class="ft-badge">B20 · B50 · B100</div>
+          <div class="ft-price">From $1.55/L</div>
+        </div>
+      </div>
+
+    </div><!-- /4-card row -->
+
+  </div>
+</section>
+
+<!-- ========== TESTIMONIALS ========== -->
+<!--
+  ============================================================
+  TESTIMONIALS – CARDS ALIGNMENT
+  ------------------------------------------------------------
+  PREVIOUSLY: 3 cards using col-lg-4 with NO col-md set.
+    This meant on medium screens (tablets) each card took full
+    width (col-12 default), stacking them one below the other.
+
+  CHANGED TO: col-lg-4 col-md-4 on each card so the 3 cards
+    always sit side by side in ONE row from medium screens up:
+    [James Mitchell] [Sarah Kim] [Robert Osei]
+
+  TO REVERT: Remove col-md-4 from each card column div.
+  ============================================================
+-->
+<section class="testimonials-section section-pad">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <div class="section-label mx-auto">What Clients Say</div>
+      <h2 class="section-title">Customer <span class="text-accent">Testimonials</span></h2>
+      <p class="section-sub">Thousands of happy customers trust FuelFlow every day</p>
+    </div>
+
+    <!-- 3 testimonial cards in one row: LEFT | MIDDLE | RIGHT -->
+    <div class="row g-4">
+
+      <!-- Testimonial 1 — LEFT -->
+      <!-- PREVIOUSLY: col-lg-4 (no col-md, so stacked on tablets) -->
+      <!-- CHANGED TO: col-lg-4 col-md-4 (stays 3-per-row from medium up) -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="testi-card">
+          <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+          <div class="testi-stars">★★★★★</div>
+          <p>"FuelFlow's AI scheduled my delivery perfectly — the tank was at 15% when they arrived. Absolutely seamless and hassle-free!"</p>
+          <div class="testi-author">
+            <div class="testi-avatar jm">JM</div>
+            <div><strong>James Mitchell</strong><span>Fleet Manager, LogiCore Ltd</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonial 2 — MIDDLE (featured) -->
+      <!-- PREVIOUSLY: col-lg-4 (no col-md) | CHANGED TO: col-lg-4 col-md-4 -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="testi-card featured-testi">
+          <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+          <div class="testi-stars">★★★★★</div>
+          <p>"I never thought fuel delivery could be this effortless. The app is beautiful, the tracking is real-time, and the drivers are always professional."</p>
+          <div class="testi-author">
+            <div class="testi-avatar sk">SK</div>
+            <div><strong>Sarah Kim</strong><span>Small Business Owner</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonial 3 — RIGHT -->
+      <!-- PREVIOUSLY: col-lg-4 (no col-md) | CHANGED TO: col-lg-4 col-md-4 -->
+      <div class="col-lg-4 col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="testi-card">
+          <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+          <div class="testi-stars">★★★★★</div>
+          <p>"We power 3 construction sites with FuelFlow. The analytics dashboard helps us budget fuel costs with pinpoint accuracy every month."</p>
+          <div class="testi-author">
+            <div class="testi-avatar ro">RO</div>
+            <div><strong>Robert Osei</strong><span>Ops Director, BuildRight Inc</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /3-card row -->
+
+  </div>
+</section>
+
+<!-- ========== CTA ========== -->
+<section class="cta-section">
+  <div class="cta-bg-img"></div>
+  <div class="cta-overlay"></div>
+  <div class="container text-center cta-content" data-aos="zoom-in">
+    <div class="cta-badge"><i class="fas fa-bolt me-2"></i>Limited Time Offer</div>
+    <h2>Get Your First Delivery <span>Free!</span></h2>
+    <p>Sign up today and receive your first fuel delivery on us. No hidden charges, no long-term commitments required.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+      <a href="#contact" class="btn btn-cta-primary"><i class="fas fa-rocket me-2"></i>Get Started Free</a>
+      <a href="#contact" class="btn btn-cta-outline"><i class="fas fa-phone me-2"></i>Talk to Sales</a>
+    </div>
+    <div class="cta-truck-img">
+      <img src="{% static 'images/fuel-truck-side.svg' %}" alt="FuelFlow truck" class="cta-truck"/>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CONTACT ========== -->
+<section class="contact-section section-pad" id="contact">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5" data-aos="fade-right">
+        <div class="section-label">Get In Touch</div>
+        <h2 class="section-title">Contact <span class="text-accent">Us</span></h2>
+        <p class="section-body">Have questions? Our team is ready to help you get started with smart fuel delivery today.</p>
+        <div class="contact-info-list mt-4">
+          <div class="ci-item"><div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div><div><strong>Head Office</strong><span>45 Energy Drive, Tech Hub District</span></div></div>
+          <div class="ci-item"><div class="ci-icon"><i class="fas fa-phone-alt"></i></div><div><strong>Call Us</strong><span>+1 800 FUEL NOW</span></div></div>
+          <div class="ci-item"><div class="ci-icon"><i class="fas fa-envelope"></i></div><div><strong>Email</strong><span>support@fuelflow.io</span></div></div>
+          <div class="ci-item"><div class="ci-icon"><i class="fas fa-clock"></i></div><div><strong>Support Hours</strong><span>24/7 Delivery Support Available</span></div></div>
+        </div>
+        <!-- Mini truck image in contact -->
+        <div class="contact-truck mt-4">
+          <img src="{% static 'images/fuel-truck-side.svg' %}" alt="Our delivery truck" class="contact-truck-img"/>
+          <p class="contact-truck-caption">Our certified delivery fleet is ready for you</p>
+        </div>
+      </div>
+      <div class="col-lg-7" data-aos="fade-left">
+        <div class="contact-form-card">
+          <h4 class="mb-4">Send Us a Message</h4>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name *</label>
+              <input type="text" class="form-control cf-input" placeholder="John Doe" id="cf-name"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email Address *</label>
+              <input type="email" class="form-control cf-input" placeholder="john@example.com" id="cf-email"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control cf-input" placeholder="+1 234 567 890"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Service Required</label>
+              <select class="form-control cf-input">
+                <option>Select a service...</option>
+                <option>On-Demand Delivery</option>
+                <option>Scheduled Delivery</option>
+                <option>Commercial Fleet Fueling</option>
+                <option>AI Prediction Setup</option>
+                <option>Usage Analytics</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Your Message</label>
+              <textarea class="form-control cf-input" rows="4" placeholder="Tell us about your fuel needs..." id="cf-msg"></textarea>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary-custom w-100" id="cf-submit">
+                <i class="fas fa-paper-plane me-2"></i>Send Message
+              </button>
+              <div class="cf-success mt-2 d-none" id="cf-success">
+                <i class="fas fa-check-circle me-2"></i>Message sent successfully! We'll respond within 2 hours.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <img src="{% static 'images/logo.svg' %}" alt="FuelFlow" height="44" class="mb-3 footer-logo-img"/>
+          <p class="footer-desc">The smartest way to manage and receive fuel. AI-powered predictions. Real-time tracking. Zero downtime. Zero fuel anxiety.</p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+          <h6 class="footer-heading">Company</h6>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-4">
+          <h6 class="footer-heading">Services</h6>
+          <ul class="footer-links">
+            <li><a href="#services">On-Demand</a></li>
+            <li><a href="#services">Scheduled</a></li>
+            <li><a href="#services">Commercial</a></li>
+            <li><a href="#prediction">AI Prediction</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-4">
+          <h6 class="footer-heading">Support</h6>
+          <ul class="footer-links">
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2">
+          <h6 class="footer-heading">Download App</h6>
+          <div class="d-flex flex-column gap-2">
+            <a href="#" class="app-btn"><i class="fab fa-apple me-2"></i>App Store</a>
+            <a href="#" class="app-btn"><i class="fab fa-google-play me-2"></i>Play Store</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+      <span>© 2025 FuelFlow. All rights reserved.</span>
+      <span>Built with <i class="fas fa-heart" style="color:var(--primary)"></i> for a smarter energy future</span>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-chevron-up"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

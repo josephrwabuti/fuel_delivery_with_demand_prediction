@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" width="500" height="400">
+  <defs>
+    <linearGradient id="mapbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1b2a"/>
+      <stop offset="100%" stop-color="#152233"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="400" fill="url(#mapbg)" rx="16"/>
+  <!-- Map grid roads -->
+  <line x1="0" y1="120" x2="500" y2="120" stroke="#1e3a52" stroke-width="8"/>
+  <line x1="0" y1="220" x2="500" y2="220" stroke="#1e3a52" stroke-width="8"/>
+  <line x1="0" y1="300" x2="500" y2="300" stroke="#1e3a52" stroke-width="5"/>
+  <line x1="100" y1="0" x2="100" y2="400" stroke="#1e3a52" stroke-width="5"/>
+  <line x1="220" y1="0" x2="220" y2="400" stroke="#1e3a52" stroke-width="8"/>
+  <line x1="360" y1="0" x2="360" y2="400" stroke="#1e3a52" stroke-width="5"/>
+  <!-- Blocks -->
+  <rect x="108" y="128" width="104" height="84" rx="4" fill="#0f2030" opacity="0.8"/>
+  <rect x="228" y="128" width="124" height="84" rx="4" fill="#0f2030" opacity="0.8"/>
+  <rect x="108" y="228" width="104" height="64" rx="4" fill="#0f2030" opacity="0.8"/>
+  <rect x="228" y="228" width="124" height="64" rx="4" fill="#0f2030" opacity="0.8"/>
+  <rect x="10" y="20" width="82" height="92" rx="4" fill="#0f2030" opacity="0.7"/>
+  <rect x="370" y="20" width="120" height="92" rx="4" fill="#0f2030" opacity="0.7"/>
+  <rect x="370" y="228" width="120" height="64" rx="4" fill="#0f2030" opacity="0.7"/>
+  <!-- Route line -->
+  <path d="M80 350 Q80 220 160 220 Q220 220 220 160 Q220 120 290 120 Q340 120 340 80" stroke="#e85d04" stroke-width="3" fill="none" stroke-dasharray="10,5" opacity="0.8"/>
+  <!-- Destination pin -->
+  <circle cx="340" cy="65" r="18" fill="#e85d04"/>
+  <circle cx="340" cy="65" r="8" fill="white"/>
+  <path d="M340 83 L340 95" stroke="#e85d04" stroke-width="3"/>
+  <!-- Truck icon on route -->
+  <circle cx="200" cy="175" r="16" fill="#f4a926"/>
+  <text x="200" y="181" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">🚛</text>
+  <!-- Origin pin -->
+  <circle cx="80" cy="350" r="14" fill="#4cd164"/>
+  <circle cx="80" cy="350" r="6" fill="white"/>
+  <!-- Distance label -->
+  <rect x="170" y="138" width="100" height="22" rx="11" fill="#e85d04"/>
+  <text x="220" y="153" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle" font-weight="bold">ETA: 8 mins</text>
+  <!-- Legend -->
+  <circle cx="30" cy="370" r="6" fill="#4cd164"/>
+  <text x="42" y="375" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">Your Location</text>
+  <circle cx="30" cy="388" r="6" fill="#e85d04"/>
+  <text x="42" y="393" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">Delivery Point</text>
+</svg>
