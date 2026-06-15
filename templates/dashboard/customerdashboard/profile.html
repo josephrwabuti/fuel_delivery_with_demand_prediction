@@ -11,7 +11,7 @@
 </head>
 <body>
 
-{% include 'partials/customersidebar.html' with active='profile' %}
+{% include 'partials/sidebar.html' with active='profile' %}
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="topbar">
@@ -177,15 +177,7 @@
       <div class="card">
         <div class="card-header"><span class="card-title">Notifications</span></div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
-          {% for label in "Delivery updates,AI prediction alerts,Promotions & offers,Account activity"|split:"," %}
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span class="text-sm" style="color:var(--text)">{{ label }}</span>
-            <label class="toggle-switch">
-              <input type="checkbox" checked/>
-              <span class="ts-track"></span>
-            </label>
-          </div>
-          {% endfor %}
+          
           <!-- Static fallback if no template tag for split -->
           <div style="display:flex;justify-content:space-between;align-items:center" class="notif-pref-row">
             <span class="text-sm" style="color:var(--text)">Delivery updates</span>
