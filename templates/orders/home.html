@@ -34,7 +34,7 @@
         <li class="nav-item"><a class="nav-link" href="#prediction">AI Prediction</a></li>
         <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-        <li class="nav-item ms-2"><a class="btn btn-order" href="#contact">Order Fuel</a></li>
+        <li class="nav-item ms-2"><a class="btn btn-order" href="{% url 'auth' %}">Order Fuel</a></li>
       </ul>
     </div>
   </div>
@@ -285,7 +285,7 @@
           <h4>On-Demand Delivery</h4>
           <p>Order fuel instantly and have it delivered within the hour. Available 24/7 including weekends and public holidays.</p>
           <ul class="sc-list"><li>60-minute delivery guarantee</li><li>Live driver tracking</li><li>Digital receipt &amp; invoice</li></ul>
-          <a href="#contact" class="sc-link">Get Started <i class="fas fa-arrow-right ms-1"></i></a>
+          <a href="{% url 'auth' %}" class="sc-link">Get Started <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
       </div>
 
@@ -698,7 +698,7 @@
     <h2>Get Your First Delivery <span>Free!</span></h2>
     <p>Sign up today and receive your first fuel delivery on us. No hidden charges, no long-term commitments required.</p>
     <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
-      <a href="#contact" class="btn btn-cta-primary"><i class="fas fa-rocket me-2"></i>Get Started Free</a>
+      <a href="{% url 'auth' %}" class="btn btn-cta-primary"><i class="fas fa-rocket me-2"></i>Get Started Free</a>
       <a href="#contact" class="btn btn-cta-outline"><i class="fas fa-phone me-2"></i>Talk to Sales</a>
     </div>
     <div class="cta-truck-img">

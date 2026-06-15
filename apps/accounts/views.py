@@ -27,3 +27,8 @@ def auth_view(request):
                 return redirect('dashboard')  # later
 
     return render(request, 'accounts/login_register.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+
