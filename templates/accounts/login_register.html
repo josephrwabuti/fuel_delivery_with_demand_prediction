@@ -28,7 +28,7 @@
 
     <!-- ===== SIGN IN FORM (LEFT) ===== -->
     <div class="form-container sign-in-container">
-      <form method="post" class="auth-form" onsubmit="return false;">
+      <form method="post" class="auth-form">
         {% csrf_token %}
         <div class="brand-logo">
           <div class="brand-icon-sm"><i class="fas fa-gas-pump"></i></div>
@@ -43,15 +43,15 @@
         <p class="divider-text">or use your account</p>
         <div class="input-group-ff">
           <i class="fas fa-envelope input-icon"></i>
-          <input type="email" class="ff-input" placeholder="Email Address" required/>
+          <input type="email" name="email" class="ff-input" placeholder="Email Address" required/>
         </div>
         <div class="input-group-ff">
           <i class="fas fa-lock input-icon"></i>
-          <input type="password" class="ff-input" placeholder="Password" id="siPassword" required/>
+          <input type="password" name="password" class="ff-input" placeholder="Password" id="siPassword" required/>
           <button type="button" class="toggle-pw" onclick="togglePw('siPassword',this)"><i class="fas fa-eye-slash"></i></button>
         </div>
         <a href="#" class="forgot-link">Forgot your password?</a>
-        <button type="submit" class="btn-submit" onclick="handleSignIn(this)">
+        <button type="submit" name="login" class="btn-submit" onclick="handleSignIn(this)">
           <i class="fas fa-sign-in-alt me-2"></i>SIGN IN
         </button>
         <!-- Mobile only toggle -->
@@ -61,7 +61,7 @@
 
     <!-- ===== SIGN UP FORM (RIGHT) ===== -->
     <div class="form-container sign-up-container">
-      <form  method="post" class="auth-form" onsubmit="return false;">
+      <form  method="post" class="auth-form">
         {% csrf_token %}
         <div class="brand-logo">
           <div class="brand-icon-sm"><i class="fas fa-gas-pump"></i></div>
@@ -91,16 +91,16 @@
         </div>
         <div class="input-group-ff">
           <i class="fas fa-envelope input-icon"></i>
-          <input type="email" class="ff-input" placeholder="Email Address" required/>
+          <input type="email" name="email" class="ff-input" placeholder="Email Address" required/>
         </div>
         <div class="input-group-ff">
           <i class="fas fa-lock input-icon"></i>
-          <input type="password" class="ff-input" placeholder="Password" id="suPassword" required/>
+          <input type="password" name="password1" class="ff-input" placeholder="Password" id="suPassword" required/>
           <button type="button" class="toggle-pw" onclick="togglePw('suPassword',this)"><i class="fas fa-eye-slash"></i></button>
         </div>
         <div class="input-group-ff"> 
           <i class="fas fa-lock input-icon"></i> 
-          <input type="password" name="confirm_password" class="ff-input" placeholder="Confirm Password" id="suConfirmPassword" required/>
+          <input type="password" name="password2" class="ff-input" placeholder="Confirm Password" id="suConfirmPassword" required/>
         </div>
         <div class="input-group-ff">
           <i class="fas fa-gas-pump input-icon"></i>
@@ -112,7 +112,7 @@
             <option>Bio-Fuel</option>
           </select>
         </div>
-        <button type="submit" class="btn-submit" onclick="handleSignUp(this)">
+        <button type="submit" name="register" class="btn-submit" onclick="handleSignUp(this)">
           <i class="fas fa-rocket me-2"></i>SIGN UP
         </button>
         <!-- Mobile only toggle -->

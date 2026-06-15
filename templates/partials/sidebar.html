@@ -1,12 +1,11 @@
 <!-- =====================================================
      FUELFLOW SIDEBAR PARTIAL
-     Usage: {% include 'partials/sidebar.html' with active='dashboard' %}
      active values: dashboard | orders | new_order | notifications | profile
      ===================================================== -->
 <aside class="sidebar" id="sidebar">
 
   <!-- Brand -->
-  <a href="{% url 'dashboard' %}" class="sidebar-brand">
+  <a href="{% url 'customer_dashboard' %}" class="sidebar-brand">
     <div class="sb-logo"><i class="fas fa-gas-pump"></i></div>
     <span class="sb-title">Fuel<span>Flow</span></span>
   </a>
@@ -25,7 +24,7 @@
 
     <span class="nav-section-label">Main Menu</span>
 
-    <a href="{% url 'dashboard' %}" class="nav-item {% if active == 'cstmdashboard' %}active{% endif %}">
+    <a href="{% url 'customer_dashboard' %}" class="nav-item {% if active == 'dashboard' %}active{% endif %}">
       <i class="fas fa-gauge-high"></i>
       <span>Dashboard</span>
     </a>
