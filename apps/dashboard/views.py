@@ -5,3 +5,5 @@ from django.contrib.auth.decorators import login_required
 def dashboard_home(request):
     return render(request, 'dashboard/cstmdashboard.html')
 
+
+

@@ -43,9 +43,10 @@ def auth_view(request):
                 print("USER SAVED:", user.username)
                 
                 
-                Profile.objects.create(user=user, role='customer')
-                
-                Profile.objects.create(user=user, role='driver')
+                Profile.objects.create(
+                   user=user,
+                   role='customer'
+                )
                 
                 print("USER SAVED:", user.username)
                 
