@@ -124,7 +124,7 @@
                 {% endfor %}
               {% else %}
               <!-- Demo rows -->
-              {% for row in "1,2,3,4,5,6,7,8"|split:"," %}
+              
               <tr data-month="{% cycle 'jun' 'jun' 'may' 'may' 'may' 'apr' 'apr' 'apr' %}">
                 <td><span class="del-id">#FF-20{% cycle '42' '41' '40' '39' '38' '37' '36' '35' %}</span></td>
                 <td class="text-sm">{% cycle 'James Mitchell' 'Sarah Kim' 'Robert Osei' 'Anna Peters' 'Marcus Webb' 'James Mitchell' 'Sarah Kim' 'Robert Osei' %}</td>
@@ -133,9 +133,9 @@
                 <td class="text-muted text-sm">{% cycle 'Jun 3' 'Jun 2' 'May 30' 'May 28' 'May 22' 'Apr 30' 'Apr 28' 'Apr 25' %}, 2026</td>
                 <td class="text-sm">{% cycle '45 min' '52 min' '38 min' '1h 2m' '28 min' '1h 15m' '40 min' '48 min' %}</td>
                 <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
-                <td><a href="{% url 'delivery_detail' forloop.counter %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a></td>
+                <td><a href="#" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a></td>
               </tr>
-              {% endfor %}
+              
               {% endif %}
             </tbody>
           </table>
@@ -166,33 +166,26 @@
       <div class="card">
         <div class="card-header"><span class="card-title">Fuel Breakdown</span></div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-          {% for fuel, pct, count in fuel_breakdown|default:"Diesel,62,92|Petrol,24,36|Bio-Fuel,9,13|Kerosene,5,7"|split:"|" %}
-          {% with parts=fuel.split:',' %}
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-              <span style="font-size:0.78rem;color:var(--text)">{{ parts.0 }}</span>
-              <span style="font-size:0.78rem;color:var(--text-muted)">{{ parts.2 }} trips ({{ parts.1 }}%)</span>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+              <span style="font-size:0.78rem; color:var(--text)">Diesel</span>
+              <span style="font-size:0.78rem; color:var(--text-muted)">92 trips (62%%)</span>
             </div>
-            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
-              <div style="height:100%;width:{{ parts.1 }}%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            <div style="height:6px; background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:62%;background:linear-gradient(90deg,var(--driver),var(--primary)); border-radius:3px"></div>
             </div>
           </div>
-          {% endwith %}
-          {% empty %}
-          <!-- Static fallback -->
-          {% for item in "Diesel,62,92|Petrol,24,36|Bio-Fuel,9,13|Kerosene,5,7"|split:"|" %}
-          {% with p=item|split:',' %}
+
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-              <span style="font-size:0.78rem;color:var(--text)">{{ p.0 }}</span>
-              <span style="font-size:0.78rem;color:var(--text-muted)">{{ p.2 }} trips ({{ p.1 }}%)</span>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+              <span style="font-size:0.78rem; color:var(--text)">Petrol</span>
+              <span style="font-size:0.78rem; color:var(--text-muted)">36 trips (24%)</span>
             </div>
-            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
-              <div style="height:100%;width:{{ p.1 }}%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
+            <div style="height:6px; background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:62%;background:linear-gradient(90deg,var(--driver),var(--primary)); border-radius:3px"></div>
             </div>
           </div>
-          {% endwith %}
-          {% endfor %}
+
           <!-- Pure static fallback always shown -->
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:5px">
@@ -230,7 +223,7 @@
               <div style="height:100%;width:5%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
             </div>
           </div>
-          {% endfor %}
+
         </div>
       </div>
 

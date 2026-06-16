@@ -50,5 +50,8 @@ def profile(request):
     return render(request, '')
 
 def delivery_history(request):
-    return render(request, 'dashboard/driverdashboard/history.html')
+    context = {
+        'history': []
+    }
+    return render(request, 'dashboard/driverdashboard/history.html', context)
 
