@@ -45,6 +45,8 @@ def auth_view(request):
                 
                 Profile.objects.create(user=user, role='customer')
                 
+                Profile.objects.create(user=user, role='driver')
+                
                 print("USER SAVED:", user.username)
                 
                 return redirect('auth')

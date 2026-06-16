@@ -16,6 +16,7 @@ urlpatterns = [
     path('driver/profile/', views.driver_profile, name='driver_profile'),
     path('driver/deliveries/', views.my_deliveries, name='my_deliveries'),
     path('driver/available/', views.available_orders, name='available_orders'),
+    path('driver/deliveryhistory/', views.delivery_history, name='delivery_history'),
     
     path('driver/delivery/<int:id>/', views.delivery_detail, name='delivery_detail'),
     path('driver/update/<int:id>/', views.update_status, name='update_status'),

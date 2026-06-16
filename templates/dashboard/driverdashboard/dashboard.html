@@ -136,7 +136,33 @@
                   <td class="text-sm">{{ d.customer_name }}</td>
                   <td class="text-muted text-sm">{{ d.delivery_address }}</td>
                   <td class="text-sm">{{ d.time_slot }}</td>
-                  <td><span class="badge badge-{{ d.status|lower|replace:' ','-' }}"><i class="fas fa-circle"></i>{{ d.status }}</span></td>
+                  <td>
+                    {% if d.status == 'Pending' %}
+                        <span class="badge badge-pending">
+                          <i class="fas fa-circle"></i>
+                          {{ d.status }}
+                        </span>
+
+                    {% elif d.status == 'En Route' %}
+                        <span class="badge badge-en-route">
+                          <i class="fas fa-circle"></i>
+                          {{ d.status }}
+                        </span>  
+                        
+                    {% elif d.status == 'Delivered' %}
+                        <span class="badge badge-delivered">
+                          <i class="fas fa-circle"></i>
+                          {{ d.status }}
+                        </span>
+
+                    {% else %}
+                        <span class="badge badge-pending">
+                          <i class="fas fa-circle"></i>
+                          {{ d.status }}
+                        </span>
+                    {% endif %}
+
+                  </td>
                   <td><a href="{% url 'delivery_detail' d.id %}" class="btn btn-ghost btn-sm"><i class="fas fa-arrow-right"></i></a></td>
                 </tr>
                 {% endfor %}

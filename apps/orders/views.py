@@ -29,7 +29,7 @@ def delete_account(request):
     return render(request, '')
 
 def driver_profile(request):
-    return render(request, 'dashboard/driverdashboard/driverprofile.html')
+    return render(request, 'dashboard/driverdashboard/driver_profile.html')
 
 def my_deliveries(request):
     return render(request, 'dashboard/driverdashboard/my_deliveries.html')
@@ -37,7 +37,7 @@ def my_deliveries(request):
 def available_orders(request):
     return render(request, 'dashboard/driverdashboard/available_orders.html')
 
-def delivery_detail(request):
+def delivery_detail(request, id):
     return render(request, 'dashboard/driverdashboard/delivery_detail.html')
 
 def update_status(request):
@@ -48,4 +48,7 @@ def notifications(request):
 
 def profile(request):
     return render(request, '')
+
+def delivery_history(request):
+    return render(request, 'dashboard/driverdashboard/history.html')
 
