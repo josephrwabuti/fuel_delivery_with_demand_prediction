@@ -133,38 +133,9 @@
               </td>
             </tr>
             {% endfor %}
-          {% else %}
+          
           <!-- Demo rows -->
-          {% for row in "1,2,3,4,5,6,7,8"|split:"," %}
-          <tr data-status="{% cycle 'Pending' 'En Route' 'Processing' 'Delivered' 'Pending' 'Delivered' 'Cancelled' 'En Route' %}"
-              data-fuel="{% cycle 'Kerosene' 'Bio-Fuel' 'Petrol' 'Diesel' 'Diesel' 'Petrol' 'Diesel' 'Petrol' %}">
-            <td><span class="row-id">#FF-20{% cycle '48' '47' '46' '45' '44' '43' '42' '41' %}</span></td>
-            <td>
-              <div class="user-cell">
-                <div class="user-avatar {% cycle 'blue' 'green' 'orange' 'purple' 'blue' 'green' 'orange' 'purple' %}" style="font-size:0.72rem">
-                  {% cycle 'HL' 'MW' 'AP' 'RO' 'SK' 'JM' 'TW' 'PB' %}
-                </div>
-                <div>
-                  <div class="user-name">{% cycle 'Harbour Logistics' 'Marcus Webb' 'Anna Peters' 'Robert Osei' 'Sarah Kim' 'James Mitchell' 'Tom Webb' 'Paula Brown' %}</div>
-                  <div class="user-email">{% cycle 'harbour@ex.com' 'marcus@ex.com' 'anna@ex.com' 'robert@ex.com' 'sarah@ex.com' 'james@ex.com' 'tom@ex.com' 'paula@ex.com' %}</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              {% cycle '<button class="btn btn-warning btn-sm" onclick="openAssignModal(\'FF-2048\')"><i class="fas fa-user-plus"></i> Assign</button>' '<div class="user-cell"><div class="user-avatar green" style="width:30px;height:30px;font-size:0.7rem">CR</div><span class="text-sm">Carlos R.</span></div>' '<div class="user-cell"><div class="user-avatar blue" style="width:30px;height:30px;font-size:0.7rem">JK</div><span class="text-sm">James K.</span></div>' '<div class="user-cell"><div class="user-avatar orange" style="width:30px;height:30px;font-size:0.7rem">PN</div><span class="text-sm">Priya N.</span></div>' '<button class="btn btn-warning btn-sm"><i class="fas fa-user-plus"></i> Assign</button>' '<div class="user-cell"><div class="user-avatar green" style="width:30px;height:30px;font-size:0.7rem">CR</div><span class="text-sm">Carlos R.</span></div>' '—' '<div class="user-cell"><div class="user-avatar blue" style="width:30px;height:30px;font-size:0.7rem">JK</div><span class="text-sm">James K.</span></div>' %}
-            </td>
-            <td>{% cycle 'Kerosene 80L' 'Bio-Fuel 150L' 'Petrol 100L' 'Diesel 300L' 'Diesel 200L' 'Petrol 100L' 'Diesel 200L' 'Petrol 100L' %}</td>
-            <td class="text-muted text-sm">{% cycle 'Factory Gate 3' '7 Green Valley Rd' '22 Bloom St' 'Site B Industrial' '12 Park Ave' '45 Main St' '8 Commerce Rd' '34 West Ave' %}</td>
-            <td class="text-muted text-sm">{% cycle 'Jun 4' 'Jun 4' 'Jun 3' 'Jun 3' 'Jun 3' 'Jun 2' 'Jun 2' 'Jun 1' %}</td>
-            <td><span class="badge badge-{% cycle 'pending' 'en-route' 'processing' 'delivered' 'pending' 'delivered' 'cancelled' 'en-route' %}"><i class="fas fa-circle"></i>{% cycle 'Pending' 'En Route' 'Processing' 'Delivered' 'Pending' 'Delivered' 'Cancelled' 'En Route' %}</span></td>
-            <td>
-              <div class="action-group">
-                <button class="btn btn-ghost btn-icon" title="View" onclick="openViewModal('FF-20{% cycle '48' '47' '46' '45' '44' '43' '42' '41' %}')"><i class="fas fa-eye"></i></button>
-                <button class="btn btn-danger btn-icon" title="Delete" onclick="openDeleteModal('order','#FF-20{% cycle '48' '47' '46' '45' '44' '43' '42' '41' %}')"><i class="fas fa-trash"></i></button>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
+          
           {% endif %}
         </tbody>
       </table>

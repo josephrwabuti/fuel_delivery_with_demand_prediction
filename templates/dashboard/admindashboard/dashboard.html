@@ -228,20 +228,20 @@
       <div class="card-body" style="padding:12px 22px">
         {% for driver in top_drivers|default:"" %}
         {% empty %}
-        {% for d in "Carlos Rivera,48,96%|James Kimani,41,98%|Priya Nair,37,94%|Tom Okafor,33,97%"|split:"|" %}
-        {% with p=d|split:',' %}
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <div class="user-avatar green" style="width:36px;height:36px;font-size:0.72rem">
-            {{ p.0|slice:":1" }}{{ p.0|slice:"p.0|wordcount:1+1:p.0|wordcount:1+2" }}
+        <div class="driver-row">
+          <div class="user-avatar green">CR</div>
+          <div>
+            <div>Carlos Rivera</div>
+            <div>48 deliveries . 96% on-time</div>
           </div>
-          <div style="flex:1">
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text)">{{ p.0 }}</div>
-            <div style="font-size:0.74rem;color:var(--text-muted)">{{ p.1 }} deliveries · {{ p.2 }} on-time</div>
-          </div>
-          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">{{ p.1 }}</div>
         </div>
-        {% endwith %}
-        {% endfor %}
+        <div class="driver-row">
+          <div class="user-avatar blue">JK</div>
+          <div>
+            <div>James Kiman</div>
+            <div>41 deliveries . 98% on-time</div>
+          </div>
+        </div>
         <!-- Static fallback always shown -->
         {% endfor %}
         <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">

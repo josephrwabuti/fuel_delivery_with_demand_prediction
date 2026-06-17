@@ -135,7 +135,7 @@
             {% endfor %}
           {% else %}
           <!-- Demo rows -->
-          {% for i in "1,2,3,4,5,6"|split:"," %}
+          {% for i in demo_drivers %}
           <tr>
             <td>
               <div class="user-cell">
@@ -162,15 +162,15 @@
             <td>
               <div class="action-group">
                 <button class="btn btn-ghost btn-icon" title="View Deliveries"
-                  onclick="openDriverDeliveriesModal('{{ i }}','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}')">
+                  onclick="openDriverDeliveriesModal('{{ forloop.counter }}','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}')">
                   <i class="fas fa-list"></i>
                 </button>
                 <button class="btn btn-ghost btn-icon" title="Change Role"
-                  onclick="openChangeRoleModal('{{ i }}','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}','{% cycle 'Senior Driver' 'Driver' 'Supervisor' 'Driver' 'Driver' 'Driver' %}')">
+                  onclick="openChangeRoleModal('{{ forloop.counter }}','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}','{% cycle 'Senior Driver' 'Driver' 'Supervisor' 'Driver' 'Driver' 'Driver' %}')">
                   <i class="fas fa-shield-halved"></i>
                 </button>
                 <button class="btn btn-danger btn-icon" title="Delete"
-                  onclick="openDeleteModal('Driver','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}','/admin/drivers/{{ i }}/delete/')">
+                  onclick="openDeleteModal('Driver','{% cycle 'Carlos Rivera' 'James Kimani' 'Priya Nair' 'Tom Okafor' 'Lily Wong' 'Ben Musa' %}','/admin/drivers/{{ forloop.counter }}/delete/')">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
