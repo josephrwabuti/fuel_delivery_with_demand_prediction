@@ -1,9 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from apps.orders.models import Order
 
 @login_required
 def dashboard_home(request):
-    return render(request, 'dashboard/cstmdashboard.html')
+    orders = Order.objects.filter(user=request.user)
+    
+    total_orders = orders.count()
+    pending_orders =  orders.filter(status="Pending").count()
+    delivered_orders = orders.filter(status="Delivered").count()
+    
+    return render(request, 'dashboard/customerdashboard/dashboard.html', {
+        "orders": orders,
+        "total_orders": total_orders,
+        "pending_orders": pending_orders,
+        "delivered_orders": delivered_orders
+    })
 
 def dashboard(request):
     return render(request, "dashboard/admindashboard/dashboard.html")
@@ -14,9 +26,17 @@ def admin_orders(request):
 
 @login_required
 def admin_customers(request):
-    demo_customers = range(8)
+    customers = User.objects.filter(order__isnull=False).distinct()
+    
+    data = []
+    for c in customers:
+        data.append({
+            "user": c,
+            "orders_count": c.order_set.count(),
+            "last_order": c.order_set.last()
+        })
     return render(request, 'dashboard/admindashboard/customers.html', {
-        "demo_customers": demo_customers
+        "customers": data
     })
 
 @login_required
@@ -31,9 +51,6 @@ def admin_drivers(request):
 def admin_reports(request):
     return render(request, 'dashboard/admindashboard/reports.html')
 
-@login_required
-def admin_settings(request):
-    return render(request, 'dashboard/admindashboard/settings.html')
 
 def assign_driver(request):
     if request.method == "POST":
@@ -125,6 +142,8 @@ def admin_save_pricing(request):
         bio_fuel = request.POST.get("price_bio-fuel")
         
         return redirect("admin_settings")
+    
+    return redirect("admin_settings")
 
 
 

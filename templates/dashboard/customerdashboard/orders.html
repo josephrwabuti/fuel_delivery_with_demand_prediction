@@ -77,13 +77,13 @@
         <tbody>
           {% if orders %}
             {% for order in orders %}
-            <tr data-status="{{ order.status|lower }}">
+            <tr data-status="{{ order.status }}">
               <td><span class="order-id">#{{ order.id }}</span></td>
               <td><span class="fuel-type-pill"><i class="fas fa-gas-pump"></i>{{ order.fuel_type }}</span></td>
               <td>{{ order.quantity }}L</td>
               <td style="color:var(--accent);font-weight:600">${{ order.amount }}</td>
               <td class="text-muted text-sm">{{ order.delivery_address }}</td>
-              <td class="text-muted text-sm">{{ order.date|date:"M d, Y" }}</td>
+              <td class="text-muted text-sm">{{ order.created_at|date:"M d, Y" }}</td>
               <td><span class="badge badge-{{ order.status|lower }}"><i class="fas fa-circle"></i>{{ order.status }}</span></td>
               <td>
                 <a href="{% url 'track_order' order.id %}" class="btn btn-ghost btn-sm">
@@ -94,55 +94,13 @@
             {% endfor %}
           {% else %}
           <!-- Static demo rows — replace with Django queryset -->
-          <tr data-status="delivered">
-            <td><span class="order-id">#FF-2041</span></td>
-            <td><span class="fuel-type-pill"><i class="fas fa-gas-pump"></i>Diesel</span></td>
-            <td>200L</td>
-            <td style="color:var(--accent);font-weight:600">$276.00</td>
-            <td class="text-muted text-sm">45 Main St, Downtown</td>
-            <td class="text-muted text-sm">Jun 1, 2026</td>
-            <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
-            <td><button class="btn btn-ghost btn-sm" onclick="openTrackModal('FF-2041','Delivered')"><i class="fas fa-location-dot"></i> Track</button></td>
-          </tr>
-          <tr data-status="processing">
-            <td><span class="order-id">#FF-2040</span></td>
-            <td><span class="fuel-type-pill"><i class="fas fa-fire-flame-curved"></i>Petrol</span></td>
-            <td>100L</td>
-            <td style="color:var(--accent);font-weight:600">$142.00</td>
-            <td class="text-muted text-sm">12 Park Ave, Westside</td>
-            <td class="text-muted text-sm">May 28, 2026</td>
-            <td><span class="badge badge-processing"><i class="fas fa-circle"></i>Processing</span></td>
-            <td><button class="btn btn-primary btn-sm" onclick="openTrackModal('FF-2040','En Route')"><i class="fas fa-location-dot"></i> Track</button></td>
-          </tr>
-          <tr data-status="delivered">
-            <td><span class="order-id">#FF-2039</span></td>
-            <td><span class="fuel-type-pill"><i class="fas fa-leaf"></i>Bio-Fuel</span></td>
-            <td>150L</td>
-            <td style="color:var(--accent);font-weight:600">$232.50</td>
-            <td class="text-muted text-sm">45 Main St, Downtown</td>
-            <td class="text-muted text-sm">May 22, 2026</td>
-            <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
-            <td><button class="btn btn-ghost btn-sm" onclick="openTrackModal('FF-2039','Delivered')"><i class="fas fa-location-dot"></i> Track</button></td>
-          </tr>
-          <tr data-status="pending">
-            <td><span class="order-id">#FF-2038</span></td>
-            <td><span class="fuel-type-pill"><i class="fas fa-flask"></i>Kerosene</span></td>
-            <td>80L</td>
-            <td style="color:var(--accent);font-weight:600">$92.00</td>
-            <td class="text-muted text-sm">8 Commerce Rd</td>
-            <td class="text-muted text-sm">May 18, 2026</td>
-            <td><span class="badge badge-pending"><i class="fas fa-circle"></i>Pending</span></td>
-            <td><button class="btn btn-ghost btn-sm" onclick="openTrackModal('FF-2038','Pending')"><i class="fas fa-location-dot"></i> Track</button></td>
-          </tr>
-          <tr data-status="cancelled">
-            <td><span class="order-id">#FF-2037</span></td>
-            <td><span class="fuel-type-pill"><i class="fas fa-gas-pump"></i>Diesel</span></td>
-            <td>300L</td>
-            <td style="color:var(--accent);font-weight:600">$414.00</td>
-            <td class="text-muted text-sm">Site B, Industrial Zone</td>
-            <td class="text-muted text-sm">May 15, 2026</td>
-            <td><span class="badge badge-cancelled"><i class="fas fa-circle"></i>Cancelled</span></td>
-            <td><button class="btn btn-ghost btn-sm" disabled style="opacity:0.4;cursor:default"><i class="fas fa-ban"></i> Cancelled</button></td>
+          <tr>
+            <td colspan="8" style="text-align:center; padding: 40px;">
+              <i class="fas fa-box-open" style="font-size:40px; color:gray"></i>
+              <h3>No Orders Yet </h3>
+              <p> You haven't placed any order yet.</P>
+              <a href="{% url 'new_order' %}" class="btn btn-primary">Place Your First Order</a>
+            </td>
           </tr>
           {% endif %}
         </tbody>

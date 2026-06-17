@@ -1,5 +1,54 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from .models import Order
+from .forms import OrderForm
+from django.contrib.auth.decorators import login_required
+
+
+
+@login_required
+def place_order(request):
+    if request.method == "POST":
+        
+        fuel_type = request.POST.get("fuel_type")
+        quantity = request.POST.get("quantity")
+        delivery_address = request.POST.get("delivery_address")
+        delivery_date = request.POST.get("delivery_date")
+        time_slot = request.POST.get("time_slot")
+        instructions = request.POST.get("instructions")
+        
+        
+        Order.objects.create(
+            user = request.user,
+            fuel_type = fuel_type,
+            quantity = quantity, 
+            delivery_address = delivery_address,
+            delivery_date = delivery_date,
+            time_slot = time_slot,
+            instructions = instructions
+        )
+        
+        return redirect("customer_orders")
+      
+    return render(request, "dashboard/customerdashboard/new_order.html")
+
+@login_required
+def track_order(request, id):
+    order = get_object_or_404(Order, id = id,
+        user = request.user )
+    
+    return render(request, "dashboard/customerdashboard/track_order.html", {
+        "order": order
+    })
+    
+    
+@login_required
+def customer_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by("-created_at")
+    
+    return render(request, "dashboard/customerdashboard/orders.html", {
+        "orders": orders
+    })
 
 def home(request):
     return render(request, 'orders/home.html')
@@ -17,17 +66,14 @@ def customer_profile(request):
     return render(request, 'dashboard/customerdashboard/profile.html')
 
 
-def place_order(request):
-    return render(request, 'dashboard/customerdashboard/new_order.html')
-
 def update_profile(request):
-    return render(request, '')
+    return redirect('customer_profile')
 
 def change_password(request):
-    return render(request, '')
+    return redirect('customer_profile')
 
 def delete_account(request):
-    return render(request, '')
+    return redirect('home')
 
 def driver_profile(request):
     return render(request, 'dashboard/driverdashboard/driver_profile.html')
@@ -47,7 +93,7 @@ def update_status(request):
 
 def delivery_history(request):
     context = {
-        'history': []
+        
     }
     return render(request, 'dashboard/driverdashboard/history.html', context)
 
@@ -56,4 +102,5 @@ def update_driver_profile(request):
         #saving logic later
         return redirect("driver_profile")
     return redirect("driver_profile")
+
 
