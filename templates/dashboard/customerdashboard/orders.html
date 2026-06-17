@@ -22,7 +22,7 @@
   <div class="topbar-right">
     <a href="{% url 'new_order' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Order</a>
     <a href="{% url 'notifications' %}" class="topbar-btn"><i class="fas fa-bell"></i><span class="tb-dot"></span></a>
-    <a href="{% url 'profile' %}" class="topbar-profile">
+    <a href="{% url 'customer_profile' %}" class="topbar-profile">
       <div class="tp-avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
       <span class="tp-name">{{ user.first_name }}</span>
     </a>

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 def home(request):
@@ -13,8 +13,9 @@ def new_order(request):
 def notifications(request):
     return render(request, 'dashboard/customerdashboard/notifications.html')
 
-def profile(request):
+def customer_profile(request):
     return render(request, 'dashboard/customerdashboard/profile.html')
+
 
 def place_order(request):
     return render(request, 'dashboard/customerdashboard/new_order.html')
@@ -43,15 +44,16 @@ def delivery_detail(request, id):
 def update_status(request):
     return render(request, '')
 
-def notifications(request):
-    return render(request, '')
-
-def profile(request):
-    return render(request, '')
 
 def delivery_history(request):
     context = {
         'history': []
     }
     return render(request, 'dashboard/driverdashboard/history.html', context)
+
+def update_driver_profile(request):
+    if request.method == "POST":
+        #saving logic later
+        return redirect("driver_profile")
+    return redirect("driver_profile")
 

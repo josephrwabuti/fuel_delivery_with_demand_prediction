@@ -21,7 +21,7 @@
   </div>
   <div class="topbar-right">
     <button class="btn btn-ghost btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark all read</button>
-    <a href="{% url 'profile' %}" class="topbar-profile">
+    <a href="{% url 'customer_profile' %}" class="topbar-profile">
       <div class="tp-avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
       <span class="tp-name">{{ user.first_name }}</span>
     </a>
