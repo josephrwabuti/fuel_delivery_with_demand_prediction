@@ -9,16 +9,57 @@ from django.contrib.auth.models import User
 
 
 @staff_member_required
+def admin_orders(request):
+    
+    orders = Order.objects.select_related(
+        "user",
+        "driver"
+    ).order_by("-created_at")
+    
+    available_drivers = User.objects.filter(
+        profile__role="driver"
+    )
+    
+    context = {
+        "orders": orders,
+        "available_drivers": available_drivers,
+        
+        "total_orders": orders.count(),
+        
+        "pending_orders": orders.filter(status="Pending").count()
+        
+        "delivered_orders": orders.filter(status="Delivered").count()
+        
+        "cancelled_orders": orders.filter(status="Cancelled").count()
+    }
+    
+    return render(
+        request, "dashboard/admindashboard/orders.html", context
+    )
+
+
+@staff_member_required
 def assign_driver(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+    
+    drivers = User.objects.filter(profile__role="driver")
 
     if request.method == "POST":
-        driver = User.objects.get(id=request.POST.get("driver_id"))
+        driver_id = request.POST.get("driver_id")
+        
+        driver = get_object_or_404(User, id=driver_id)
+        
         order.diver = driver
         order.status = "Driver Assigned"
         order.save()
 
-    return redirect("admin_orders")
+        return redirect("admin_orders")
+
+    return render(request, "dashboard/admindashboard/assign_driver.html", {
+        "order": order,
+        "drivers": drivers
+    })
+    
 
 
 @login_required
@@ -44,34 +85,80 @@ def driver_dashboard(request):
         "completed_orders": completed_orders
     }
 
-    
-
-    return render(request, "dashboard/driverdashboard/dashboard.html", {
-        "orders": orders
-    })
+    return render(request, "dashboard/driverdashboard/dashboard.html", context)
     
     
 @login_required
 def my_deliveries(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    
+    if profile.role != "driver":
+        return redirect("home")
+    
     orders = Order.objects.filter(
         driver=request.user,
         status__in=["Driver Assigned", "En Route"]
-    )
+    ).order_by("-delivery_date")
 
     return render(request, "dashboard/driverdashboard/my_deliveries.html", {
         "orders": orders
     })
     
+    
+@login_required
+def delivery_history(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    
+    if profile.role != "driver":
+        return redirect("home")
+    
+    
+    history = Order.objects.filter(
+        driver=request.user,
+        status="Delivered"
+    ).order_by("-created_at")
+    
+    return render(request, 'dashboard/driverdashboard/history.html', {
+        "orders": history
+    })
+    
+    
 @login_required
 def update_delivery_status(request, id):
-    order = Order.objects.get(id=id, driver=request.user)
+    order = get_object_or_404(
+        Order,
+        id=id, 
+        driver=request.user
+    )
 
     if request.method == "POST":
-        new_status = request.POST.get("status")
-        order.status = new_status
-        order.save()
+        status = request.POST.get("status")
+        
+        if status in [
+            "Driver Assigned",
+            "En Route",
+            "Delivered"
+        ]:
+            order.status = status
+            order.save()
 
-    return redirect("my_deliveries")
+        return redirect("delivery_detail", id=order.id)
+    
+    return render (request, "dashboard/driverdashboard/update_status.html", {
+        "order": order
+    })
+
+
+@login_required
+def delivery_detail(request, id):
+    order = get_object_or_404(
+        Order,
+        id=id,
+        driver=request.user
+    )
+    return render(request, 'dashboard/driverdashboard/delivery_detail.html', {
+        "order": order
+    })
 
 
 
@@ -116,17 +203,7 @@ def customer_orders(request):
         "orders": orders
     })
     
-@login_required
-def delivery_history(request):
-    orders = Order.objects.filter(
-        driver=request.user,
-        status="Delivered"
-    ).order_by("-created_at")
-    
-    return render(request, 'dashboard/driverdashboard/history.html', {
-        "orders": orders
-    })
-    
+
     
 @login_required
 def available_orders(request):

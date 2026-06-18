@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, driver_views
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -10,6 +10,7 @@ urlpatterns = [
     
     path("assign-driver/<int:order_id>/", views.assign_driver, name="assign_driver"),
     
+    path("driver/dashboard/", views.driver_dashboard, name="driver_dashboard"),
     path("driver/my-deliveries/", views.my_deliveries, name="my_deliveries"),
     path('driver/delivery/<int:id>/', views.delivery_detail, name='delivery_detail'),
     path("driver/update-status/<int:id>/", views.update_delivery_status, name="update_delivery_status"),
@@ -17,7 +18,7 @@ urlpatterns = [
     path('driver/profile/update/', views.update_driver_profile, name="update_driver_profile"),
     path('driver/available-orders/', views.available_orders, name='available_orders'),
     path('driver/deliveryhistory/', views.delivery_history, name='delivery_history'),
-    path("driver/dashboard/", views.driver_dashboard, name="driver_dashboard"),
+    
     
     
     

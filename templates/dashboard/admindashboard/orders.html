@@ -105,8 +105,8 @@
               <td><span class="row-id">#{{ o.id }}</span></td>
               <td>
                 <div class="user-cell">
-                  <div class="user-avatar blue">{{ o.customer.first_name.0 }}{{ o.customer.last_name.0 }}</div>
-                  <div><div class="user-name">{{ o.customer.get_full_name }}</div><div class="user-email">{{ o.customer.email }}</div></div>
+                  <div class="user-avatar blue">{{ o.user.first_name.0 }}{{ o.user.last_name.0 }}</div>
+                  <div><div class="user-name">{{ o.user.get_full_name }}</div><div class="user-email">{{ o.user.email }}</div></div>
                 </div>
               </td>
               <td>
@@ -200,7 +200,7 @@
       <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:14px">
         Order <strong id="assignOrderId" style="color:var(--primary)"></strong> has no driver. Select one to assign:
       </p>
-      <form method="POST" action="{% url 'assign_driver' %}" id="assignForm">
+      <form method="POST" id="assignForm">
         {% csrf_token %}
         <input type="hidden" name="order_id" id="assignOrderInput"/>
         <div class="form-group">
