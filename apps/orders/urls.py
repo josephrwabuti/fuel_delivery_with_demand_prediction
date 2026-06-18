@@ -4,15 +4,22 @@ from . import views
 urlpatterns = [
     path('', views.home, name='home'),
     
-    path("orders/", views.orders, name="customer_orders"),
+    path("orders/", views.customer_orders, name="customer_orders"),
     path("new-order/", views.new_order, name="new_order"),
     path('place-order/', views.place_order, name="place_order"),
     
     path("assign-driver/<int:order_id>/", views.assign_driver, name="assign_driver"),
     
-    path("driver/dashboard/", views.driver_dashboard, name="driver_dashboard"),
     path("driver/my-deliveries/", views.my_deliveries, name="my_deliveries"),
+    path('driver/delivery/<int:id>/', views.delivery_detail, name='delivery_detail'),
     path("driver/update-status/<int:id>/", views.update_delivery_status, name="update_delivery_status"),
+    path('driver/profile/', views.driver_profile, name='driver_profile'),
+    path('driver/profile/update/', views.update_driver_profile, name="update_driver_profile"),
+    path('driver/available-orders/', views.available_orders, name='available_orders'),
+    path('driver/deliveryhistory/', views.delivery_history, name='delivery_history'),
+    path("driver/dashboard/", views.driver_dashboard, name="driver_dashboard"),
+    
+    
     
     path('notifications/', views.notifications, name='notifications'),
     path('profile/', views.customer_profile, name="customer_profile"),
@@ -24,12 +31,11 @@ urlpatterns = [
     path('delete-account/', views.delete_account, name='delete_account'),
     
     
-    path('driver/profile/update/', views.update_driver_profile, name="update_driver_profile"),
-    path('driver/deliveries/', views.my_deliveries, name='my_deliveries'),
-    path('driver/available/', views.available_orders, name='available_orders'),
-    path('driver/deliveryhistory/', views.delivery_history, name='delivery_history'),
+
+   
     
-    path('driver/delivery/<int:id>/', views.delivery_detail, name='delivery_detail'),
-    path('driver/update/<int:id>/', views.update_status, name='update_status'),
+    
+    
+    
     
 ]

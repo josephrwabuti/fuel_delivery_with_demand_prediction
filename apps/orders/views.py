@@ -5,6 +5,7 @@ from .models import Order
 from .forms import OrderForm
 from django.contrib.auth.decorators import login_required
 from apps.accounts.models import Profile
+from django.contrib.auth.models import User
 
 
 @staff_member_required
@@ -12,8 +13,8 @@ def assign_driver(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
     if request.method == "POST":
-        driver_id = request.POST.get("driver_id")
-        order.driver_id = driver_id
+        driver = User.objects.get(id=request.POST.get("driver_id"))
+        order.diver = driver
         order.status = "Driver Assigned"
         order.save()
 
@@ -22,12 +23,28 @@ def assign_driver(request, order_id):
 
 @login_required
 def driver_dashboard(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_object_or_404(Profile, user=request.user)
 
     if profile.role != "driver":
         return redirect("home")
+    
+    total_orders = Order.objects.filter(driver=request.user).count()
+    active_orders = Order.objects.filter(driver=request.user, 
+                status__in=["Driver Assigned", "En Route"]
+                ).count()
+    completed_orders = Order.objects.filter(
+        driver=request.user,
+        status="Delivered"
+    ).count()
+    
+    context = {
+        "orders": Order.objects.filter(driver=request.user).order_by("-created_at"),
+        "total_orders": total_orders,
+        "active_orders": active_orders,
+        "completed_orders": completed_orders
+    }
 
-    orders = Order.objects.filter(driver=request.user).order_by("-created_at")
+    
 
     return render(request, "dashboard/driverdashboard/dashboard.html", {
         "orders": orders
@@ -98,6 +115,29 @@ def customer_orders(request):
     return render(request, "dashboard/customerdashboard/orders.html", {
         "orders": orders
     })
+    
+@login_required
+def delivery_history(request):
+    orders = Order.objects.filter(
+        driver=request.user,
+        status="Delivered"
+    ).order_by("-created_at")
+    
+    return render(request, 'dashboard/driverdashboard/history.html', {
+        "orders": orders
+    })
+    
+    
+@login_required
+def available_orders(request):
+    orders = Order.objects.filter(
+        status="Confirmed",
+        driver__isnull=True
+    )
+    
+    return render(request, 'dashboard/driverdashboard/available_orders.html', {
+        "orders": orders
+    })
 
 def home(request):
     return render(request, 'orders/home.html')
@@ -127,24 +167,10 @@ def delete_account(request):
 def driver_profile(request):
     return render(request, 'dashboard/driverdashboard/driver_profile.html')
 
-def my_deliveries(request):
-    return render(request, 'dashboard/driverdashboard/my_deliveries.html')
-
-def available_orders(request):
-    return render(request, 'dashboard/driverdashboard/available_orders.html')
 
 def delivery_detail(request, id):
     return render(request, 'dashboard/driverdashboard/delivery_detail.html')
 
-def update_status(request):
-    return render(request, '')
-
-
-def delivery_history(request):
-    context = {
-        
-    }
-    return render(request, 'dashboard/driverdashboard/history.html', context)
 
 def update_driver_profile(request):
     if request.method == "POST":
