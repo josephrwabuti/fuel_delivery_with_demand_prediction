@@ -5,18 +5,15 @@ from apps.orders.models import Order
 @login_required
 def dashboard_home(request):
     orders = Order.objects.filter(user=request.user)
-    
-    total_orders = orders.count()
-    pending_orders =  orders.filter(status="Pending").count()
-    delivered_orders = orders.filter(status="Delivered").count()
-    
-    return render(request, 'dashboard/customerdashboard/dashboard.html', {
-        "orders": orders,
-        "total_orders": total_orders,
-        "pending_orders": pending_orders,
-        "delivered_orders": delivered_orders
-    })
 
+    return render(request, "dashboard/customerdashboard/dashboard.html", {
+        "orders": orders,
+        "total_orders": orders.count(),
+        "pending_orders": orders.filter(status="Pending").count(),
+        "delivered_orders": orders.filter(status="Delivered").count(),
+    })
+    
+    
 def dashboard(request):
     return render(request, "dashboard/admindashboard/dashboard.html")
 

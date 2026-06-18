@@ -8,6 +8,12 @@ urlpatterns = [
     path("new-order/", views.new_order, name="new_order"),
     path('place-order/', views.place_order, name="place_order"),
     
+    path("assign-driver/<int:order_id>/", views.assign_driver, name="assign_driver"),
+    
+    path("driver/dashboard/", views.driver_dashboard, name="driver_dashboard"),
+    path("driver/my-deliveries/", views.my_deliveries, name="my_deliveries"),
+    path("driver/update-status/<int:id>/", views.update_delivery_status, name="update_delivery_status"),
+    
     path('notifications/', views.notifications, name='notifications'),
     path('profile/', views.customer_profile, name="customer_profile"),
     

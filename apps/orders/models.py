@@ -11,8 +11,9 @@ class Order(models.Model):
     
     STATUS = [
         ("Pending", "Pending"),
-        ("Assigned", "Assigned"),
-        ("On Route", "On Route"),
+        ("Confirmed", "Confirmed"),
+        ("Drive Assigned", "Driver Assigned"),
+        ("En Route", "En Route"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
     ]
@@ -32,4 +33,13 @@ class Order(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.fuel_type}"
+    
+    
+driver = models.ForeignKey(
+    "auth.User",
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="deliveries"
+)
     
