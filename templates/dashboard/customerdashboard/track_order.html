@@ -1,13 +1,35 @@
-<h2> Track Order <h2>
+{% load static %}
 
-<p><strong>Order ID:</strong>#{{ order.id }}</P>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Odrer</title>
+    <link rel="stylesheet" href="{% static 'css/customerdashboard.css' %}">
+</head>
+<body>
 
-<p><strong>Fuel:</strong>#{{ order.fuel_type }}</P>
+<h2> Track Order #{{ order.id }} <h2>
 
-<p><strong>Quantity:</strong>#{{ order.quantity }}</P>
+    <hr>
 
-<p><strong>Status: </strong>#{{ order.status }}</P>
+<p><strong>Fuel Type:</strong>{{ order.fuel_type }}</P>
 
-<p><strong>Address: </strong>#{{ order.delivery }}</P>
+<p><strong>Quantity:</strong>{{ order.quantity }} Litres</P>
 
-<p><strong>Date:</strong>#{{ order.delivery_date }}</P>
+<p><strong>Delivery Address: </strong>{{ order.delivery_address }}</P>
+
+<p><strong>Delivery Date:</strong>{{ order.delivery_date }}</P>
+
+<p><strong>Time Slot:</strong>{{ order.time_slot }}</P>
+
+<p><strong>Status: </strong>{{ order.status }}</P>
+
+<p><strong>Ordered On:</strong>{{ order.created_at}}</P>
+
+    <a href="{% url 'customer_orders' %}">
+        ~ Back to My Orders
+    </a>
+    
+</body>
+</html>
+

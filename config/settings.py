@@ -127,7 +127,7 @@ STATICFILES_DIRS = [
 ]
 
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/auth/'
 LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = '/accounts/auth/'
 

@@ -10,14 +10,6 @@ from django.contrib.auth.decorators import login_required
 def place_order(request):
     if request.method == "POST":
         
-        fuel_type = request.POST.get("fuel_type")
-        quantity = request.POST.get("quantity")
-        delivery_address = request.POST.get("delivery_address")
-        delivery_date = request.POST.get("delivery_date")
-        time_slot = request.POST.get("time_slot")
-        instructions = request.POST.get("instructions")
-        
-        
         Order.objects.create(
             user = request.user,
             fuel_type = fuel_type,
@@ -27,6 +19,14 @@ def place_order(request):
             time_slot = time_slot,
             instructions = instructions
         )
+        
+        fuel_type = request.POST.get("fuel_type")
+        quantity = request.POST.get("quantity")
+        delivery_address = request.POST.get("delivery_address")
+        delivery_date = request.POST.get("delivery_date")
+        time_slot = request.POST.get("time_slot")
+        instructions = request.POST.get("instructions")
+        
         
         return redirect("customer_orders")
       
@@ -45,6 +45,10 @@ def track_order(request, id):
 @login_required
 def customer_orders(request):
     orders = Order.objects.filter(user=request.user).order_by("-created_at")
+    
+    print("USER:", request.user)
+    print("ORDERS FOUND", orders)
+    
     
     return render(request, "dashboard/customerdashboard/orders.html", {
         "orders": orders
