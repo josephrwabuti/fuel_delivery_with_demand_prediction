@@ -18,7 +18,7 @@ urlpatterns = [
     path("driver/profile/update/", views.update_driver_profile, name="update_driver_profile"),
     path("driver/available-orders/", views.available_orders, name="available_orders"),
     path("driver/deliveryhistory/", views.delivery_history, name="delivery_history"),
-    path("driver/claim-order/<int:order_id/", views.claim_order, name="claim_order"),
+    path("driver/claim-order/<int:order_id>/", views.claim_order, name="claim_order"),
     
     
     

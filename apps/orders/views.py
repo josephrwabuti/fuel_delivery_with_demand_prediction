@@ -8,6 +8,7 @@ from apps.accounts.models import Profile
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
+from django.db import transaction
 
 
 @staff_member_required
@@ -88,7 +89,7 @@ def driver_dashboard(request):
         "todays_assignments": todays_assignments,
         "todays_deliveries": todays_assignments.count(),
         "todays_pending": todays_assignments.exclude(status="Delivered").count(),
-        "totaL_completed": Order.objects.filter(driver=request.user, status="Delivered").count(),
+        "total_completed": Order.objects.filter(driver=request.user, status="Delivered").count(),
         "total_litres": 0, #fix later
         "on_time_rate": 96,
         "available_count": Order.objects.filter(driver__isnull=True, status="Pending").count(),
@@ -140,6 +141,7 @@ def delivery_history(request):
     
 @login_required
 def update_delivery_status(request, id):
+    
     order = get_object_or_404(
         Order,
         id=id, 
@@ -148,16 +150,24 @@ def update_delivery_status(request, id):
 
     if request.method == "POST":
         
+        allowed_flow = [
+            "Driver Assigned",
+            "Fuel Loaded",
+            "En Route",
+            "Arrived",
+            "Delivered"
+        ]
+        
         new_status = request.POST.get("status")
         
-        if new_status in [
-            "En Route",
-            "Delivered"
-        ]:
+        if new_status in allowed_flow:
+            
             order.status = new_status
             order.save()
 
         return redirect("my_deliveries")
+    
+    return redirect("my_deliveries")
     
 
 
@@ -176,10 +186,12 @@ def delivery_detail(request, id):
 @login_required
 def claim_order(request, order_id):
     
-    if request.method == "POST":
+    if request.method != "POST":
+        return redirect("available_orders")
         
-        order = get_object_or_404(Order, id=order_id)
-        
+    with transaction.atomic():
+        order = Order.objects.select_for_update().get(id=order_id)
+    
         if order.driver:
             messages.error(request, "This order has already been claimed!")
             
@@ -205,9 +217,11 @@ def claim_order(request, order_id):
         order.status = "Driver Assigned"
         order.save()
         
-        messages.succes(request, "Order claimed successfully!")
-    
-    return redirect("my_deliveries")
+        messages.success(request, f"Order #{order_id} claimed successfully!")
+        
+        print("CLAIM ORDER:", order_id, order.driver)
+        
+        return redirect("my_deliveries")
 
 
 @login_required
@@ -215,12 +229,12 @@ def available_orders(request):
     
     orders = Order.objects.filter(
         driver__isnull=True,
-        status="Confirmed"
+        status__in=["Pending", "Confirmed"]
     )
     
     return render(
         request, "dashboard/driverdashboard/available_orders.html", {
-            "available_orders": available_orders
+            "available_orders": orders
         }
     )
 
@@ -295,10 +309,6 @@ def delete_account(request):
 
 def driver_profile(request):
     return render(request, 'dashboard/driverdashboard/driver_profile.html')
-
-
-def delivery_detail(request, id):
-    return render(request, 'dashboard/driverdashboard/delivery_detail.html')
 
 
 def update_driver_profile(request):

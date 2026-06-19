@@ -75,7 +75,7 @@
       </div>
 
       <!-- Update form -->
-      <form method="POST" action="{% url 'update_status' active_delivery.id|default:1 %}" id="statusForm">
+      <form method="POST" action="{% url 'update_delivery_status' active_delivery.id|default:1 %}" id="statusForm">
         {% csrf_token %}
         <div class="row-2col" style="gap:18px;align-items:end">
           <div class="form-group">
@@ -153,43 +153,9 @@
             </tr>
             {% endfor %}
           {% else %}
-          <!-- Demo rows -->
-          <tr data-status="delivered">
-            <td><span class="del-id">#FF-2042</span></td>
-            <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>Diesel</span> 200L</td>
-            <td class="text-sm">James Mitchell</td>
-            <td class="text-muted text-sm">45 Main St, Downtown</td>
-            <td class="text-sm">8AM–12PM</td>
-            <td class="text-muted text-sm">Jun 3</td>
-            <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
-            <td><a href="{% url 'delivery_detail' 1 %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a></td>
-          </tr>
-          <tr data-status="en-route">
-            <td><span class="del-id">#FF-2043</span></td>
-            <td><span class="fuel-pill"><i class="fas fa-fire-flame-curved"></i>Petrol</span> 100L</td>
-            <td class="text-sm">Sarah Kim</td>
-            <td class="text-muted text-sm">12 Park Ave, Westside</td>
-            <td class="text-sm">12PM–5PM</td>
-            <td class="text-muted text-sm">Jun 3</td>
-            <td><span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span></td>
-            <td style="display:flex;gap:6px">
-              <a href="{% url 'delivery_detail' 2 %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a>
-              <button class="btn btn-driver btn-sm" onclick="openUpdateModal('FF-2043','En Route')"><i class="fas fa-arrows-rotate"></i> Update</button>
-            </td>
-          </tr>
-          <tr data-status="pending">
-            <td><span class="del-id">#FF-2044</span></td>
-            <td><span class="fuel-pill"><i class="fas fa-leaf"></i>Bio-Fuel</span> 150L</td>
-            <td class="text-sm">Robert Osei</td>
-            <td class="text-muted text-sm">8 Commerce Rd</td>
-            <td class="text-sm">5PM–8PM</td>
-            <td class="text-muted text-sm">Jun 3</td>
-            <td><span class="badge badge-pending"><i class="fas fa-circle"></i>Pending</span></td>
-            <td style="display:flex;gap:6px">
-              <a href="{% url 'delivery_detail' 3 %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a>
-              <button class="btn btn-driver btn-sm" onclick="openUpdateModal('FF-2044','Pending')"><i class="fas fa-arrows-rotate"></i> Update</button>
-            </td>
-          </tr>
+          <tr>
+            <td colspan="8">No deliveries yet</td>
+          </td>
           {% endif %}
         </tbody>
       </table>
@@ -206,7 +172,7 @@
       <button class="modal-close" onclick="closeModal('updateModal')"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <form method="POST" action="{% url 'update_status' 0 %}" id="modalStatusForm">
+      <form method="POST" action="{% url 'update_delivery_status' 0 %}" id="modalStatusForm">
         {% csrf_token %}
         <div style="display:flex;flex-direction:column;gap:14px">
           <div class="form-group">

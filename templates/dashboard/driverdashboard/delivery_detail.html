@@ -150,7 +150,7 @@
         <div class="ss-step pending" data-step="5"><div class="ss-dot"><i class="fas fa-circle-check"></i></div><span class="ss-label">Delivered</span></div>
       </div>
 
-      <form method="POST" action="{% url 'update_status' delivery.id|default:1 %}">
+      <form method="POST" action="{% url 'update_delivery_status' delivery.id|default:1 %}">
         {% csrf_token %}
         <div class="form-2col" style="align-items:end">
 

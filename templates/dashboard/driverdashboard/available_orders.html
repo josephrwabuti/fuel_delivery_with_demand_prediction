@@ -33,6 +33,16 @@
 
 <main class="main-content">
 
+  {% if messages %}
+  <div style="margin-bottom:15px">
+    {% for message in messages %}
+      <div class="alert alert-info">
+        {{ message }}
+      </div>
+      {% endfor %}
+  </div>
+  {% endif %}
+
   <!-- Header row -->
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
     <div>
