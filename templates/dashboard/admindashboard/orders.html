@@ -65,7 +65,8 @@
       <select class="filter-select" id="statusFilter" onchange="filterByStatus()">
         <option value="all">All Statuses</option>
         <option value="Pending">Pending</option>
-        <option value="Processing">Processing</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Driver Assigned">Driver Assigned</option>
         <option value="En Route">En Route</option>
         <option value="Delivered">Delivered</option>
         <option value="Cancelled">Cancelled</option>
@@ -171,7 +172,7 @@
         <label class="form-label">Reassign Driver</label>
         <select class="form-select-lg" id="vmDriverSelect">
           <option value="">— Keep current driver —</option>
-          {% for d in drivers %}
+          {% for d in available_drivers %}
           <option value="{{ d.id }}">{{ d.get_full_name }}</option>
           {% empty %}
           <option value="1">Carlos Rivera</option>
@@ -202,7 +203,7 @@
       </p>
       <form method="POST" id="assignForm">
         {% csrf_token %}
-        <input type="hidden" name="order_id" id="assignOrderInput"/>
+        
         <div class="form-group">
           <label class="form-label">Select Driver</label>
           <select name="driver_id" class="form-select-lg" required>
@@ -250,11 +251,6 @@
 <div class="dash-toast" id="dashToast"><i class="fas fa-check-circle"></i><span id="dashToastMsg"></span></div>
 <script src="{% static 'js/admin.js' %}"></script>
 <script>
-  function openAssignModal(orderId) {
-    document.getElementById('assignOrderId').textContent    = '#' + orderId;
-    document.getElementById('assignOrderInput').value       = orderId;
-    document.getElementById('assignModal').classList.add('active');
-  }
   function openViewModal(orderId) {
     document.getElementById('vmOrderId').textContent  = '#' + orderId;
     document.getElementById('vmCustomer').textContent = 'Sarah Kim';
@@ -263,11 +259,7 @@
     document.getElementById('vmStatus').innerHTML     = '<span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span>';
     document.getElementById('viewModal').classList.add('active');
   }
-  function openDeleteModal(type, id) {
-    document.getElementById('deleteTargetLabel').textContent = 'Order ' + id;
-    document.getElementById('deleteForm').action = '/admin/orders/' + id + '/delete/';
-    document.getElementById('deleteModal').classList.add('active');
-  }
+  
   function saveDriverReassign() {
     closeModal('viewModal');
     showDashToast('Driver reassigned successfully!', 'fa-check-circle', 'var(--success)');

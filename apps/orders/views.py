@@ -6,6 +6,8 @@ from .forms import OrderForm
 from django.contrib.auth.decorators import login_required
 from apps.accounts.models import Profile
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django.contrib import messages
 
 
 @staff_member_required
@@ -26,11 +28,11 @@ def admin_orders(request):
         
         "total_orders": orders.count(),
         
-        "pending_orders": orders.filter(status="Pending").count()
+        "pending_orders": orders.filter(status="Pending").count(),
         
-        "delivered_orders": orders.filter(status="Delivered").count()
+        "delivered_orders": orders.filter(status="Delivered").count(),
         
-        "cancelled_orders": orders.filter(status="Cancelled").count()
+        "cancelled_orders": orders.filter(status="Cancelled").count(),
     }
     
     return render(
@@ -40,49 +42,57 @@ def admin_orders(request):
 
 @staff_member_required
 def assign_driver(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
     
+    order = get_object_or_404(Order, id=order_id)
     drivers = User.objects.filter(profile__role="driver")
 
     if request.method == "POST":
+        
         driver_id = request.POST.get("driver_id")
         
         driver = get_object_or_404(User, id=driver_id)
         
-        order.diver = driver
+        order.driver = driver
         order.status = "Driver Assigned"
+        order.assigned_at = timezone.now()
         order.save()
 
         return redirect("admin_orders")
-
-    return render(request, "dashboard/admindashboard/assign_driver.html", {
-        "order": order,
-        "drivers": drivers
-    })
+    
+    return redirect("admin_orders")
+    
     
 
 
 @login_required
 def driver_dashboard(request):
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if profile.role != "driver":
-        return redirect("home")
     
-    total_orders = Order.objects.filter(driver=request.user).count()
-    active_orders = Order.objects.filter(driver=request.user, 
-                status__in=["Driver Assigned", "En Route"]
-                ).count()
-    completed_orders = Order.objects.filter(
-        driver=request.user,
-        status="Delivered"
+    user = request.user
+    
+    active_delivery = Order.objects.filter(
+        driver=user,
+        status__in=["Fuel Loaded", "En Route", "Arrived"]
+    ).first()
+    
+    todays_assignments = Order.objects.filter(
+        driver=user)
+    
+    available_count = Order.objects.filter(
+        status="Pending",
+        driver__isnull=True
     ).count()
     
+    
     context = {
-        "orders": Order.objects.filter(driver=request.user).order_by("-created_at"),
-        "total_orders": total_orders,
-        "active_orders": active_orders,
-        "completed_orders": completed_orders
+        "active_delivery": active_delivery,
+        "todays_assignments": todays_assignments,
+        "todays_deliveries": todays_assignments.count(),
+        "todays_pending": todays_assignments.exclude(status="Delivered").count(),
+        "totaL_completed": Order.objects.filter(driver=request.user, status="Delivered").count(),
+        "total_litres": 0, #fix later
+        "on_time_rate": 96,
+        "available_count": Order.objects.filter(driver__isnull=True, status="Pending").count(),
+        "week_total": todays_assignments.count(),
     }
 
     return render(request, "dashboard/driverdashboard/dashboard.html", context)
@@ -90,18 +100,23 @@ def driver_dashboard(request):
     
 @login_required
 def my_deliveries(request):
-    profile = get_object_or_404(Profile, user=request.user)
     
-    if profile.role != "driver":
-        return redirect("home")
+    orders = Order.objects.filter(driver=request.user)
     
-    orders = Order.objects.filter(
-        driver=request.user,
-        status__in=["Driver Assigned", "En Route"]
-    ).order_by("-delivery_date")
+    active_delivery = orders.filter(
+        status__in=[
+            "Driver Assigned",
+            "Fuel Loaded", 
+            "En Route", 
+            "Arrived"
+        ]
+    ).first()
+    
+    
 
     return render(request, "dashboard/driverdashboard/my_deliveries.html", {
-        "orders": orders
+        "active_delivery": active_delivery,
+        "my_deliveries": orders,
     })
     
     
@@ -132,21 +147,18 @@ def update_delivery_status(request, id):
     )
 
     if request.method == "POST":
-        status = request.POST.get("status")
         
-        if status in [
-            "Driver Assigned",
+        new_status = request.POST.get("status")
+        
+        if new_status in [
             "En Route",
             "Delivered"
         ]:
-            order.status = status
+            order.status = new_status
             order.save()
 
-        return redirect("delivery_detail", id=order.id)
+        return redirect("my_deliveries")
     
-    return render (request, "dashboard/driverdashboard/update_status.html", {
-        "order": order
-    })
 
 
 @login_required
@@ -159,6 +171,58 @@ def delivery_detail(request, id):
     return render(request, 'dashboard/driverdashboard/delivery_detail.html', {
         "order": order
     })
+    
+
+@login_required
+def claim_order(request, order_id):
+    
+    if request.method == "POST":
+        
+        order = get_object_or_404(Order, id=order_id)
+        
+        if order.driver:
+            messages.error(request, "This order has already been claimed!")
+            
+            return redirect("available_orders")
+        
+        active_order = Order.objects.filter(
+            driver=request.user,
+            status__in=[
+                "Driver Assigned",
+                "Fuel Loaded",
+                "En Route",
+                "Arrived"
+            ]
+        ).exists()
+        
+        if active_order:
+            messages.error(
+                request, "Complete your current delivery before claiming another order."
+            )
+            return redirect("available_orders")
+        
+        order.driver = request.user
+        order.status = "Driver Assigned"
+        order.save()
+        
+        messages.succes(request, "Order claimed successfully!")
+    
+    return redirect("my_deliveries")
+
+
+@login_required
+def available_orders(request):
+    
+    orders = Order.objects.filter(
+        driver__isnull=True,
+        status="Confirmed"
+    )
+    
+    return render(
+        request, "dashboard/driverdashboard/available_orders.html", {
+            "available_orders": available_orders
+        }
+    )
 
 
 
@@ -203,18 +267,6 @@ def customer_orders(request):
         "orders": orders
     })
     
-
-    
-@login_required
-def available_orders(request):
-    orders = Order.objects.filter(
-        status="Confirmed",
-        driver__isnull=True
-    )
-    
-    return render(request, 'dashboard/driverdashboard/available_orders.html', {
-        "orders": orders
-    })
 
 def home(request):
     return render(request, 'orders/home.html')

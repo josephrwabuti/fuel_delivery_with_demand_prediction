@@ -108,3 +108,17 @@ function updateReportPeriod(period) {
   const labels = { month: 'This Month', quarter: 'This Quarter', year: 'This Year', all: 'All Time' };
   showDashToast('Report period set to: ' + labels[period], 'fa-chart-bar', 'var(--admin)');
 }
+
+
+function openAssignModal(orderId) {
+  document.getElementById("assignOrderId").textContent = "#" + orderId
+  document.getElementById("assignOrderInput").value = orderId
+  document.getElementById("assignForm").action = "/orders/assign-driver/" + orderId + "/";
+  openModal("assignModal");
+}
+
+function openDeleteModal(type, id) {
+  document.getElementById("deleteTargetLabel").textContent = "Order #" + id;
+  document.getElementById("deleteForm").action = "admin/orders/delete" + id + "/";
+  openModal("deleteModal");
+}

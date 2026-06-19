@@ -113,7 +113,7 @@
                 {% for d in history %}
                 <tr>
                   <td><span class="del-id">#{{ d.id }}</span></td>
-                  <td class="text-sm">{{ d.customer_name }}</td>
+                  <td class="text-sm">{{ d.user.first_name }} {{ d.user.last_name }}</td>
                   <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>{{ d.fuel_type }}</span> {{ d.quantity }}L</td>
                   <td class="text-muted text-sm">{{ d.delivery_address }}</td>
                   <td class="text-muted text-sm">{{ d.delivered_at|date:"M d, Y" }}</td>

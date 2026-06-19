@@ -13,7 +13,9 @@ class Order(models.Model):
         ("Pending", "Pending"),
         ("Confirmed", "Confirmed"),
         ("Driver Assigned", "Driver Assigned"),
+        ("Fuel Loaded", "Fuel Loaded"),
         ("En Route", "En Route"),
+        ("Arrived", "Arrived"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
     ]
@@ -31,6 +33,7 @@ class Order(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True) 
     
+        
     def __str__(self):
         return f"{self.user.username} - {self.fuel_type}"
     
@@ -42,4 +45,8 @@ class Order(models.Model):
         blank=True,
         related_name="deliveries"
     )
+    
+    assigned_at = models.DateTimeField(null=True, blank=True)
+    
+    driver_note = models.TextField(blank=True, null=True)
     
