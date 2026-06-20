@@ -28,8 +28,8 @@
       <span class="ot-label" id="otLabel">Online</span>
     </div>
     <a href="{% url 'driver_profile' %}" class="topbar-profile">
-      <div class="tp-avatar">{{ request.user.first_name.0|default:"D" }}{{ request.user.last_name.0|default:"R" }}</div>
-      <span class="tp-name">{{ request.user.first_name|default:"Driver" }}</span>
+      <div class="tp-avatar">{{ request.user.first_name.0 }}{{ request.user.last_name.0|default:"R" }}</div>
+      <span class="tp-name">{{ request.user.first_name }}</span>
     </a>
   </div>
 </div>
@@ -40,7 +40,7 @@
   <div class="detail-hero">
     <div style="flex:1">
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <div class="dh-order-id">#{{ delivery.id|default:"FF-2043" }}</div>
+        <div class="dh-order-id">#{{ delivery.id }}</div>
         <!-- Status badge — Django: replace with {{ delivery.status }} -->
         <span class="badge badge-en-route" id="currentStatusBadge">
           <i class="fas fa-circle"></i>
@@ -51,7 +51,7 @@
         <span class="dh-tag"><i class="fas fa-gas-pump"></i> {{ delivery.fuel_type|default:"Petrol" }} — {{ delivery.quantity|default:"100" }}L</span>
         <span class="dh-tag"><i class="fas fa-calendar-alt"></i> {{ delivery.delivery_date|date:"M d, Y"|default:"Jun 3, 2026" }}</span>
         <span class="dh-tag"><i class="fas fa-clock"></i> {{ delivery.time_slot|default:"12PM – 5PM" }}</span>
-        <span class="dh-tag"><i class="fas fa-user"></i> {{ delivery.customer_name|default:"Sarah Kim" }}</span>
+        <span class="dh-tag"><i class="fas fa-user"></i> {{ delivery.user.first_name}} {{ delivery.user.last_name }}</span>
       </div>
     </div>
     <!-- Quick action if not delivered -->
@@ -72,16 +72,16 @@
     <!-- Customer Info -->
     <div class="detail-box">
       <h4><i class="fas fa-user"></i> Customer</h4>
-      <div class="detail-row"><span>Full Name</span>    <span>{{ delivery.customer_name|default:"Sarah Kim" }}</span></div>
+      <div class="detail-row"><span>Full Name</span>    <span>{{ delivery.user.first_name}} {{ delivery.user.last_name }}</span></div>
       <div class="detail-row"><span>Phone</span>
-        <a href="tel:{{ delivery.customer_phone|default:'+1 555 0199' }}"
+        <a href="tel:{{ delivery.user.profile.phone }}"
            style="color:var(--driver);font-weight:600;text-decoration:none">
           <i class="fas fa-phone" style="font-size:0.7rem;margin-right:4px"></i>
-          {{ delivery.customer_phone|default:"+1 555 0199" }}
+          {{ delivery.user.profile.phone }}
         </a>
       </div>
-      <div class="detail-row"><span>Email</span>        <span style="font-size:0.8rem">{{ delivery.customer_email|default:"sarah@example.com" }}</span></div>
-      <div class="detail-row"><span>Member Since</span> <span>{{ delivery.customer_since|default:"Jan 2024" }}</span></div>
+      <div class="detail-row"><span>Email</span>        <span style="font-size:0.8rem">{{ delivery.user.email }}</span></div>
+      <div class="detail-row"><span>Member Since</span> <span>{{ delivery.user_since }}</span></div>
     </div>
 
     <!-- Delivery Info -->
@@ -105,28 +105,164 @@
     <!-- Order Timeline -->
     <div class="detail-box">
       <h4><i class="fas fa-timeline"></i> Timeline</h4>
-      <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px" id="timelineBox">
+      <<div style="display:flex;flex-direction:column;gap:12px;margin-top:4px" id="timelineBox">
+
+        <!-- Order Accepted -->
         <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:white"><i class="fas fa-check"></i></div>
-          <div><div style="font-size:0.84rem;font-weight:600;color:var(--text)">Order Accepted</div><div style="font-size:0.74rem;color:var(--text-muted)">{{ delivery.accepted_at|default:"Jun 3, 9:15 AM" }}</div></div>
+            <div style="width:28px;height:28px;border-radius:50%;
+                {% if status_order >= 1 %}
+                    background:var(--success);color:white;
+                {% else %}
+                    border:2px solid var(--border);color:var(--text-muted);
+                {% endif %}
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <div>
+                <div style="font-size:.84rem;font-weight:600;">Order Accepted</div>
+                <div style="font-size:.74rem;color:var(--text-muted)">
+                    {{ delivery.created_at|date:"M d, Y g:i A" }}
+                </div>
+            </div>
         </div>
+
+        <!-- Fuel Loaded -->
         <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:white"><i class="fas fa-check"></i></div>
-          <div><div style="font-size:0.84rem;font-weight:600;color:var(--text)">Fuel Loaded</div><div style="font-size:0.74rem;color:var(--text-muted)">{{ delivery.loaded_at|default:"Jun 3, 10:30 AM" }}</div></div>
+            <div style="width:28px;height:28px;border-radius:50%;
+                {% if status_order > 2 %}
+                    background:var(--success);color:white;
+                {% elif status_order == 2 %}
+                    background:var(--driver);color:white;box-shadow:0 0 0 4px rgba(59,130,246,.2);
+                {% else %}
+                    border:2px solid var(--border);color:var(--text-muted);
+                {% endif %}
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;">
+                <i class="fas fa-oil-can"></i>
+            </div>
+
+            <div>
+                <div style="font-size:.84rem;font-weight:600;
+                    {% if status_order == 2 %}color:var(--driver);{% endif %}">
+                    {% if status_order == 2 %}
+                        Fuel Loaded ← Current
+                    {% else %}
+                        Fuel Loaded
+                    {% endif %}
+                </div>
+
+                <div style="font-size:.74rem;color:var(--text-muted)">
+                    {% if delivery.loaded_at %}
+                        {{ delivery.loaded_at|date:"M d, Y g:i A" }}
+                    {% else %}
+                        Pending
+                    {% endif %}
+                </div>
+            </div>
         </div>
+
+        <!-- En Route -->
         <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--driver);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:white;box-shadow:0 0 0 4px rgba(59,130,246,0.2)"><i class="fas fa-truck"></i></div>
-          <div><div style="font-size:0.84rem;font-weight:600;color:var(--driver)">En Route ← Current</div><div style="font-size:0.74rem;color:var(--text-muted)">{{ delivery.en_route_at|default:"Jun 3, 11:00 AM" }}</div></div>
-        </div>
-        <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start;opacity:0.4">
-          <div style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:var(--text-muted)"><i class="fas fa-house"></i></div>
-          <div><div style="font-size:0.84rem;font-weight:600;color:var(--text-muted)">Arrived</div><div style="font-size:0.74rem;color:var(--text-muted)">Pending</div></div>
-        </div>
-        <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start;opacity:0.4">
-          <div style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:var(--text-muted)"><i class="fas fa-circle-check"></i></div>
-          <div><div style="font-size:0.84rem;font-weight:600;color:var(--text-muted)">Delivered</div><div style="font-size:0.74rem;color:var(--text-muted)">Pending</div></div>
-        </div>
+            <div style="width:28px;height:28px;border-radius:50%;
+                {% if status_order > 3 %}
+                    background:var(--success);color:white;
+                {% elif status_order == 3 %}
+                    background:var(--driver);color:white;box-shadow:0 0 0 4px rgba(59,130,246,.2);
+                {% else %}
+                    border:2px solid var(--border);color:var(--text-muted);
+                {% endif %}
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;">
+                <i class="fas fa-truck"></i>
+            </div>
+
+            <div>
+                <div style="font-size:.84rem;font-weight:600;
+                    {% if status_order == 3 %}color:var(--driver);{% endif %}">
+                    {% if status_order == 3 %}
+                        En Route ← Current
+                    {% else %}
+                        En Route
+                    {% endif %}
+                </div>
+
+                <div style="font-size:.74rem;color:var(--text-muted)">
+                    {% if delivery.en_route_at %}
+                        {{ delivery.en_route_at|date:"M d, Y g:i A" }}
+                    {% else %}
+                        Pending
+                    {% endif %}
+                </div>
+          </div>
       </div>
+
+      <!-- Arrived -->
+      <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:50%;
+              {% if status_order > 4 %}
+                  background:var(--success);color:white;
+              {% elif status_order == 4 %}
+                  background:var(--driver);color:white;box-shadow:0 0 0 4px rgba(59,130,246,.2);
+              {% else %}
+                  border:2px solid var(--border);color:var(--text-muted);
+              {% endif %}
+              display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;">
+              <i class="fas fa-location-dot"></i>
+          </div>
+
+          <div>
+              <div style="font-size:.84rem;font-weight:600;
+                  {% if status_order == 4 %}color:var(--driver);{% endif %}">
+                  {% if status_order == 4 %}
+                      Arrived ← Current
+                  {% else %}
+                      Arrived
+                  {% endif %}
+              </div>
+
+              <div style="font-size:.74rem;color:var(--text-muted)">
+                  {% if delivery.arrived_at %}
+                      {{ delivery.arrived_at|date:"M d, Y g:i A" }}
+                  {% else %}
+                      Pending
+                  {% endif %}
+              </div>
+        </div>
+    </div>
+
+    <!-- Delivered -->
+    <div class="tl-item" style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:28px;height:28px;border-radius:50%;
+            {% if status_order == 5 %}
+                background:var(--success);color:white;
+            {% else %}
+                border:2px solid var(--border);color:var(--text-muted);
+            {% endif %}
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;">
+            <i class="fas fa-circle-check"></i>
+        </div>
+
+        <div>
+            <div style="font-size:.84rem;font-weight:600;
+                {% if status_order == 5 %}color:var(--success);{% endif %}">
+                {% if status_order == 5 %}
+                    Delivered ✓
+                {% else %}
+                    Delivered
+                {% endif %}
+            </div>
+
+            <div style="font-size:.74rem;color:var(--text-muted)">
+                {% if delivery.delivered_at %}
+                    {{ delivery.delivered_at|date:"M d, Y g:i A" }}
+                {% else %}
+                    Pending
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
     </div>
 
   </div><!-- /detail-grid -->

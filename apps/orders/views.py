@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import Sum
 
 
 @staff_member_required
@@ -68,32 +69,38 @@ def assign_driver(request, order_id):
 @login_required
 def driver_dashboard(request):
     
-    user = request.user
+    driver = request.user
     
-    active_delivery = Order.objects.filter(
-        driver=user,
-        status__in=["Fuel Loaded", "En Route", "Arrived"]
-    ).first()
     
-    todays_assignments = Order.objects.filter(
-        driver=user)
+    orders = Order.objects.filter(driver=driver)
     
-    available_count = Order.objects.filter(
-        status="Pending",
-        driver__isnull=True
-    ).count()
+    today = timezone.now().date()
+    
+    todays_orders = orders.filter(delivery_date=today)
+    
+    completed = orders.filter(status="Delivered")
+    
+    total_litres = completed.aggregate(
+        total=models.Sum("quantity")
+    )["total"] or 0
+    
+    total_delivered = completed.count()
+    total_orders = orders.count()
+    
+    on_time_rate = 0
+    if total_orders > 0:
+        on_time_rate = round((total_delivered / total_orders) * 100)
     
     
     context = {
-        "active_delivery": active_delivery,
-        "todays_assignments": todays_assignments,
-        "todays_deliveries": todays_assignments.count(),
-        "todays_pending": todays_assignments.exclude(status="Delivered").count(),
-        "total_completed": Order.objects.filter(driver=request.user, status="Delivered").count(),
-        "total_litres": 0, #fix later
-        "on_time_rate": 96,
-        "available_count": Order.objects.filter(driver__isnull=True, status="Pending").count(),
-        "week_total": todays_assignments.count(),
+        "todays_deliveries": todays_orders.count(),
+        "todays_pending": todays_orders.exclude(status="Delivered").count(),
+        "total_completed": total_delivered,
+        "total_litres": total_litres,
+        "on_time_rate": on_time_rate,
+        "todays_assignments": todays_orders,
+        "active_delivery": orders.filter(status__in=["Fuel Loaded", "En Route", "Arrived"]).first(),
+        "available_count": Order.objects.filter(driver__isnull=True).count(),
     }
 
     return render(request, "dashboard/driverdashboard/dashboard.html", context)
@@ -123,20 +130,19 @@ def my_deliveries(request):
     
 @login_required
 def delivery_history(request):
-    profile = get_object_or_404(Profile, user=request.user)
-    
-    if profile.role != "driver":
-        return redirect("home")
-    
     
     history = Order.objects.filter(
         driver=request.user,
         status="Delivered"
-    ).order_by("-created_at")
+    ).order_by("-delivered_at")
     
-    return render(request, 'dashboard/driverdashboard/history.html', {
-        "orders": history
-    })
+    context = {
+        "history": history,
+        "total_delivered": history.count(),
+    }
+    
+    
+    return render(request, 'dashboard/driverdashboard/history.html', context )
     
     
 @login_required
@@ -159,10 +165,27 @@ def update_delivery_status(request, id):
         ]
         
         new_status = request.POST.get("status")
+        note = request.POST.get("note")
         
         if new_status in allowed_flow:
             
             order.status = new_status
+            
+            if note:
+                order.driver_note = note
+            
+            if new_status == "Fuel Loaded" and not order.loaded_at:
+                order.loaded_at = timezone.now()
+                
+            elif new_status == "En Route" and not order.en_route_at:
+                order.en_route_at = timezone.now()
+                
+            elif new_status == "Arrived" and not order.arrived_at:
+                order.arrived_at = timezone.now()
+            
+            elif new_status == "Delivered" and not order.delivered_at:
+                order.delivered_at = timezone.now()
+            
             order.save()
 
         return redirect("my_deliveries")
@@ -173,14 +196,26 @@ def update_delivery_status(request, id):
 
 @login_required
 def delivery_detail(request, id):
-    order = get_object_or_404(
+    delivery = get_object_or_404(
         Order,
         id=id,
         driver=request.user
     )
-    return render(request, 'dashboard/driverdashboard/delivery_detail.html', {
-        "order": order
-    })
+    
+    status_order = {
+        "Driver Assigned": 1,
+        "Fuel Loaded": 2,
+        "En Route": 3,
+        "Arrived": 4,
+        "Delivered": 5,
+    }
+    
+    context = {
+        "delivery": delivery,
+        "status_order": status_order.get(delivery.status, 1),
+    }
+    
+    return render(request, 'dashboard/driverdashboard/delivery_detail.html', context )
     
 
 @login_required
@@ -199,13 +234,9 @@ def claim_order(request, order_id):
         
         active_order = Order.objects.filter(
             driver=request.user,
-            status__in=[
-                "Driver Assigned",
-                "Fuel Loaded",
-                "En Route",
-                "Arrived"
-            ]
+            status__in=["Driver Assigned", "Fuel Loaded", "En Route", "Arrived"]
         ).exists()
+        
         
         if active_order:
             messages.error(
@@ -215,7 +246,10 @@ def claim_order(request, order_id):
         
         order.driver = request.user
         order.status = "Driver Assigned"
+        order.assigned_at = timezone.now()
         order.save()
+        
+        
         
         messages.success(request, f"Order #{order_id} claimed successfully!")
         
