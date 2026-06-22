@@ -153,11 +153,11 @@
         </div>
         <div class="card-body">
           <div class="earnings-bar">
-            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Jun</span><div class="eb-track"><div class="eb-fill" data-w="50"  style="width:0"></div></div><span class="eb-val">22</span></div>
-            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">May</span><div class="eb-track"><div class="eb-fill" data-w="82"  style="width:0"></div></div><span class="eb-val">36</span></div>
-            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Apr</span><div class="eb-track"><div class="eb-fill" data-w="68"  style="width:0"></div></div><span class="eb-val">30</span></div>
-            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Mar</span><div class="eb-track"><div class="eb-fill" data-w="100" style="width:0"></div></div><span class="eb-val">44</span></div>
-            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">Feb</span><div class="eb-track"><div class="eb-fill" data-w="36"  style="width:0"></div></div><span class="eb-val">16</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">{{ june }}</span><div class="eb-track"><div class="eb-fill" style="width:{{ june_pct }}%"></div></div><span class="eb-val"> {{ june }}</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">{{ may }}</span><div class="eb-track"><div class="eb-fill" style="width:{{ may_pct }}%"></div></div><span class="eb-val"> {{ may }}</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">{{ april }}</span><div class="eb-track"><div class="eb-fill" style="width:{{ april_pct }}%"></div></div><span class="eb-val"> {{ april }}</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">{{ march }}</span><div class="eb-track"><div class="eb-fill" style="width:{{ march_pct }}%"></div></div><span class="eb-val"> {{ march }}</span></div>
+            <div class="eb-row"><span class="eb-label" style="width:36px;font-size:0.75rem">{{ february }}</span><div class="eb-track"><div class="eb-fill" style="width:{{ february_pct }}%"></div></div><span class="eb-val"> {{ february }}</span></div>
           </div>
         </div>
       </div>
@@ -169,7 +169,7 @@
           <div>
             <div style="display:flex; justify-content:space-between; margin-bottom:5px">
               <span style="font-size:0.78rem; color:var(--text)">Diesel</span>
-              <span style="font-size:0.78rem; color:var(--text-muted)">92 trips (62%%)</span>
+              <span style="font-size:0.78rem; color:var(--text-muted)"> {{ diesel }} trips ({{ diesel_pct|floatformat:0 }}%)</span>
             </div>
             <div style="height:6px; background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
               <div style="height:100%;width:62%;background:linear-gradient(90deg,var(--driver),var(--primary)); border-radius:3px"></div>
@@ -179,7 +179,7 @@
           <div>
             <div style="display:flex; justify-content:space-between; margin-bottom:5px">
               <span style="font-size:0.78rem; color:var(--text)">Petrol</span>
-              <span style="font-size:0.78rem; color:var(--text-muted)">36 trips (24%)</span>
+              <span style="font-size:0.78rem; color:var(--text-muted)"> {{ petrol }} trips ({{ petrol_pct|floatformat:0 }}%)</span>
             </div>
             <div style="height:6px; background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
               <div style="height:100%;width:62%;background:linear-gradient(90deg,var(--driver),var(--primary)); border-radius:3px"></div>
@@ -208,7 +208,7 @@
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:5px">
               <span style="font-size:0.78rem;color:var(--text)">Bio-Fuel</span>
-              <span style="font-size:0.78rem;color:var(--text-muted)">13 trips (9%)</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)"> {{ bio }} trips ({{ bio_pct|floatformat:0 }}%)</span>
             </div>
             <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
               <div style="height:100%;width:9%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>
@@ -217,7 +217,7 @@
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:5px">
               <span style="font-size:0.78rem;color:var(--text)">Kerosene</span>
-              <span style="font-size:0.78rem;color:var(--text-muted)">7 trips (5%)</span>
+              <span style="font-size:0.78rem;color:var(--text-muted)"> {{ kerosene }} trips ({{ kerosene_pct|floatformat:0 }}%)</span>
             </div>
             <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
               <div style="height:100%;width:5%;background:linear-gradient(90deg,var(--driver),var(--primary));border-radius:3px"></div>

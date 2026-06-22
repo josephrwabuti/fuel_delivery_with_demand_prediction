@@ -105,3 +105,135 @@ document.addEventListener('DOMContentLoaded', function () {
   document.body.style.transition = 'opacity 0.3s ease';
   setTimeout(() => { document.body.style.opacity = '1'; }, 50);
 });
+
+
+function openTrackModal(
+orderId,
+status,
+created,
+assigned,
+loaded,
+enroute,
+arrived,
+delivered
+){
+
+document.getElementById("trackOrderId").innerHTML="#" + orderId;
+
+const timeline=[
+
+{
+title:"Order Placed",
+icon:"fa-clipboard-check",
+time:created,
+done:true
+},
+
+{
+title:"Driver Assigned",
+icon:"fa-user",
+time:assigned,
+done:[
+"Driver Assigned",
+"Fuel Loaded",
+"En Route",
+"Arrived",
+"Delivered"
+].includes(status)
+},
+
+{
+title:"Fuel Loaded",
+icon:"fa-gas-pump",
+time:loaded,
+done:[
+"Fuel Loaded",
+"En Route",
+"Arrived",
+"Delivered"
+].includes(status)
+},
+
+{
+title:"En Route",
+icon:"fa-truck-fast",
+time:enroute,
+done:[
+"En Route",
+"Arrived",
+"Delivered"
+].includes(status)
+},
+
+{
+title:"Arrived",
+icon:"fa-house",
+time:arrived,
+done:[
+"Arrived",
+"Delivered"
+].includes(status)
+},
+
+{
+title:"Delivered",
+icon:"fa-circle-check",
+time:delivered,
+done:status=="Delivered"
+}
+
+];
+
+let html="";
+
+timeline.forEach(function(item,index){
+
+html+=`
+
+<div class="tt-item">
+
+<div class="tt-left">
+
+<div class="tt-dot ${item.done?'done':'pending'}">
+
+<i class="fas ${item.icon}"></i>
+
+</div>
+
+${
+index<timeline.length-1
+?
+'<div class="tt-line '+(item.done?'done':'')+'"></div>'
+:
+''
+}
+
+</div>
+
+<div class="tt-content">
+
+<div class="tt-title">
+
+${item.title}
+
+</div>
+
+<div class="tt-time">
+
+${item.time && item.time!="None" ? item.time : "Waiting..."}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("trackTimeline").innerHTML=html;
+
+document.getElementById("trackModal").classList.add("active");
+
+}

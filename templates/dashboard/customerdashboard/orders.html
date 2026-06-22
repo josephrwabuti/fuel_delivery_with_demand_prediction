@@ -86,9 +86,22 @@
               <td class="text-muted text-sm">{{ order.created_at|date:"M d, Y" }}</td>
               <td><span class="badge badge-{{ order.status|lower }}"><i class="fas fa-circle"></i>{{ order.status }}</span></td>
               <td>
-                <a href="{% url 'track_order' order.id %}" class="btn btn-ghost btn-sm">
-                  <i class="fas fa-location-dot"></i> Track
-                </a>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="openTrackModal(
+                      '{{ order.id }}',
+                      '{{ order.status }}',
+                      '{{ order.created_at|date:"M d, Y H:i" }}',
+                      '{{ order.assigned_at|date:"M d, Y H:i" }}',
+                      '{{ order.loaded_at|date:"M d, Y H:i" }}',
+                      '{{ order.en_route_at|date:"M d, Y H:i" }}',
+                      '{{ order.arrived_at|date:"M d, Y H:i" }}',
+                      '{{ order.delivered_at|date:"M d, Y H:i" }}'
+                  )">
+
+                  <i class="fas fa-location-dot"></i>
+                  Track
+                </button>
               </td>
             </tr>
             {% endfor %}

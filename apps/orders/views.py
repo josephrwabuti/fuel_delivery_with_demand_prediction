@@ -10,6 +10,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Count
+from django.db.models.functions import ExtractMonth
+from datetime import datetime
 
 
 @staff_member_required
@@ -90,6 +92,28 @@ def driver_dashboard(request):
     on_time_rate = 0
     if total_orders > 0:
         on_time_rate = round((total_delivered / total_orders) * 100)
+        
+        
+    # Calculate this week's deliveries by day
+    from datetime import timedelta
+
+    today = timezone.now().date()
+    week_start = today - timedelta(days=today.weekday())  # Monday of this week
+    week_end = week_start + timedelta(days=6)  # Sunday
+
+    weekly_data = []
+    day_names = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
+    for i in range(5):  # Mon-Fri
+        day_date = week_start + timedelta(days=i)
+        day_count = orders.filter(delivery_date=day_date, status="Delivered").count()
+        weekly_data.append({
+            "day": day_names[i],
+            "count": day_count,
+            "pct": (day_count / max(5, total_delivered)) * 100 if total_delivered else 0,
+        })
+
+    week_total = sum([d["count"] for d in weekly_data])
     
     
     context = {
@@ -101,6 +125,8 @@ def driver_dashboard(request):
         "todays_assignments": todays_orders,
         "active_delivery": orders.filter(status__in=["Fuel Loaded", "En Route", "Arrived"]).first(),
         "available_count": Order.objects.filter(driver__isnull=True).count(),
+        "week_total": week_total,
+        "weekly_data": weekly_data,
     }
 
     return render(request, "dashboard/driverdashboard/dashboard.html", context)
@@ -130,19 +156,82 @@ def my_deliveries(request):
     
 @login_required
 def delivery_history(request):
-    
+
     history = Order.objects.filter(
         driver=request.user,
         status="Delivered"
     ).order_by("-delivered_at")
-    
+
+    # Statistics
+    total_delivered = history.count()
+
+    total_litres = history.aggregate(
+        total=Sum("quantity")
+    )["total"] or 0
+
+    this_month = history.filter(
+        delivered_at__month=timezone.now().month,
+        delivered_at__year=timezone.now().year
+    ).count()
+
+    # Monthly deliveries
+    monthly = (
+        history.annotate(month=ExtractMonth("delivered_at"))
+        .values("month")
+        .annotate(total=Count("id"))
+    )
+
+    monthly_data = {m["month"]: m["total"] for m in monthly}
+
+    june = monthly_data.get(6, 0)
+    may = monthly_data.get(5, 0)
+    april = monthly_data.get(4, 0)
+    march = monthly_data.get(3, 0)
+    february = monthly_data.get(2, 0)
+
+    max_month = max(june, may, april, march, february, 1)
+
+    # Fuel breakdown
+    diesel = history.filter(fuel_type="Diesel").count()
+    petrol = history.filter(fuel_type="Petrol").count()
+    bio = history.filter(fuel_type="Bio-fuel").count()
+    kerosene = history.filter(fuel_type="Kerosene").count()
+
     context = {
         "history": history,
-        "total_delivered": history.count(),
+        "total_delivered": total_delivered,
+        "total_litres": total_litres,
+        "this_month": this_month,
+        "on_time_rate": 0,
+
+        "june": june,
+        "may": may,
+        "april": april,
+        "march": march,
+        "february": february,
+
+        "june_pct": (june/max_month)*100,
+        "may_pct": (may/max_month)*100,
+        "april_pct": (april/max_month)*100,
+        "march_pct": (march/max_month)*100,
+        "february_pct": (february/max_month)*100,
+
+        "diesel": diesel,
+        "petrol": petrol,
+        "bio": bio,
+        "kerosene": kerosene,
+
+        "diesel_pct": (diesel/total_delivered*100) if total_delivered else 0,
+        "petrol_pct": (petrol/total_delivered*100) if total_delivered else 0,
+        "bio_pct": (bio/total_delivered*100) if total_delivered else 0,
+        "kerosene_pct": (kerosene/total_delivered*100) if total_delivered else 0,
     }
-    
-    
-    return render(request, 'dashboard/driverdashboard/history.html', context )
+
+    return render(
+        request,
+        "dashboard/driverdashboard/history.html",
+        context
+    )
     
     
 @login_required

@@ -190,11 +190,13 @@
         </div>
         <div class="card-body">
           <div class="earnings-bar" id="weekBars">
-            <div class="eb-row"><span class="eb-label">Mon</span><div class="eb-track"><div class="eb-fill" data-w="80"></div></div><span class="eb-val">4</span></div>
-            <div class="eb-row"><span class="eb-label">Tue</span><div class="eb-track"><div class="eb-fill" data-w="60"></div></div><span class="eb-val">3</span></div>
-            <div class="eb-row"><span class="eb-label">Wed</span><div class="eb-track"><div class="eb-fill" data-w="40"></div></div><span class="eb-val">2</span></div>
-            <div class="eb-row"><span class="eb-label">Thu</span><div class="eb-track"><div class="eb-fill" data-w="60"></div></div><span class="eb-val">3</span></div>
-            <div class="eb-row"><span class="eb-label">Fri</span><div class="eb-track"><div class="eb-fill" data-w="0"></div></div><span class="eb-val">—</span></div>
+            {% for day in weekly_data %}
+            <div class="eb-row">
+              <span class="eb-label">{{ day.day }}</span>
+              <div class="eb-track"><div class="eb-fill" data-w="{{ day.pct }}"></div></div>
+              <span class="eb-val">{{ day.count }}</span>
+            </div>
+            {% endfor %}
           </div>
         </div>
       </div>
