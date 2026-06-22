@@ -37,22 +37,22 @@
   <div class="stats-grid mb-24">
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Total Drivers</span><div class="sc-icon blue"><i class="fas fa-truck-fast"></i></div></div>
-      <div class="sc-value">{{ total_drivers|default:"18" }}</div>
+      <div class="sc-value">{{ total_drivers|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> 11 online now</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">On Delivery</span><div class="sc-icon orange"><i class="fas fa-road"></i></div></div>
-      <div class="sc-value">{{ on_delivery|default:"6" }}</div>
+      <div class="sc-value">{{ on_delivery|default_if_none:"0"}}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> active routes</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Today's Deliveries</span><div class="sc-icon green"><i class="fas fa-circle-check"></i></div></div>
-      <div class="sc-value">{{ todays_deliveries|default:"22" }}</div>
+      <div class="sc-value">{{ todays_deliveries|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 4 vs yesterday</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Avg. On-Time Rate</span><div class="sc-icon yellow"><i class="fas fa-star"></i></div></div>
-      <div class="sc-value">{{ avg_ontime|default:"96" }}<span style="font-size:1.2rem">%</span></div>
+      <div class="sc-value">{{ avg_ontime|default_if_none:"0" }}<span style="font-size:1.2rem">%</span></div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 1% this month</div>
     </div>
   </div>

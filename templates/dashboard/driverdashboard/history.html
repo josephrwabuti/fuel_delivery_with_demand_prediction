@@ -40,7 +40,7 @@
         <span class="sc-label">Total Delivered</span>
         <div class="sc-icon green"><i class="fas fa-circle-check"></i></div>
       </div>
-      <div class="sc-value">{{ total_delivered|default:"148" }}</div>
+      <div class="sc-value">{{ total_delivered|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-calendar"></i> All time</div>
     </div>
     <div class="stat-card">
@@ -48,7 +48,7 @@
         <span class="sc-label">This Month</span>
         <div class="sc-icon blue"><i class="fas fa-truck-fast"></i></div>
       </div>
-      <div class="sc-value">{{ this_month|default:"22" }}</div>
+      <div class="sc-value">{{ this_month|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 4 vs last month</div>
     </div>
     <div class="stat-card">
@@ -56,7 +56,7 @@
         <span class="sc-label">Total Litres</span>
         <div class="sc-icon orange"><i class="fas fa-gas-pump"></i></div>
       </div>
-      <div class="sc-value">{{ total_litres|default:"22.4K" }}</div>
+      <div class="sc-value">{{ total_litres|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 1.8K this month</div>
     </div>
     <div class="stat-card">
@@ -64,7 +64,7 @@
         <span class="sc-label">On-Time Rate</span>
         <div class="sc-icon yellow"><i class="fas fa-star"></i></div>
       </div>
-      <div class="sc-value">{{ on_time_rate|default:"96" }}<span style="font-size:1.2rem">%</span></div>
+      <div class="sc-value">{{ on_time_rate|default_if_none:"0" }}<span style="font-size:1.2rem">%</span></div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 2% vs last month</div>
     </div>
   </div>

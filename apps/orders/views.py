@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Count
 
 
 @staff_member_required
@@ -81,7 +81,7 @@ def driver_dashboard(request):
     completed = orders.filter(status="Delivered")
     
     total_litres = completed.aggregate(
-        total=models.Sum("quantity")
+        total=Sum("quantity")
     )["total"] or 0
     
     total_delivered = completed.count()

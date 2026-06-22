@@ -54,7 +54,7 @@
         <span class="sc-label">Total Orders</span>
         <div class="sc-icon orange"><i class="fas fa-box"></i></div>
       </div>
-      <div class="sc-value">{{ total_orders|default:"24" }}</div>
+      <div class="sc-value">{{ total_orders|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 3 this month</div>
     </div>
     <div class="stat-card">
@@ -62,7 +62,7 @@
         <span class="sc-label">Litres Ordered</span>
         <div class="sc-icon yellow"><i class="fas fa-gas-pump"></i></div>
       </div>
-      <div class="sc-value">{{ total_litres|default:"1,840" }}</div>
+      <div class="sc-value">{{ total_litres|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 120L vs last month</div>
     </div>
     <div class="stat-card">
@@ -70,7 +70,7 @@
         <span class="sc-label">Active Orders</span>
         <div class="sc-icon blue"><i class="fas fa-spinner"></i></div>
       </div>
-      <div class="sc-value">{{ active_orders|default:"2" }}</div>
+      <div class="sc-value">{{ active_orders|default_if_none:"0" }}</div>
       <div class="sc-change"><i class="fas fa-clock"></i> 1 en route</div>
     </div>
     <div class="stat-card">
@@ -78,7 +78,7 @@
         <span class="sc-label">Total Spent</span>
         <div class="sc-icon green"><i class="fas fa-wallet"></i></div>
       </div>
-      <div class="sc-value">${{ total_spent|default:"2,614" }}</div>
+      <div class="sc-value">${{ total_spent|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 8% efficiency gain</div>
     </div>
   </div>

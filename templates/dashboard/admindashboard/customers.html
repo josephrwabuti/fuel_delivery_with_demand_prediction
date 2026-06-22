@@ -34,22 +34,22 @@
   <div class="stats-grid mb-24">
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Total Customers</span><div class="sc-icon blue"><i class="fas fa-users"></i></div></div>
-      <div class="sc-value">{{ total_customers|default:"512" }}</div>
+      <div class="sc-value">{{ total_customers|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 14 this month</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Active</span><div class="sc-icon green"><i class="fas fa-user-check"></i></div></div>
-      <div class="sc-value">{{ active_customers|default:"489" }}</div>
+      <div class="sc-value">{{ active_customers|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> 95% of total</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Deactivated</span><div class="sc-icon yellow"><i class="fas fa-user-clock"></i></div></div>
-      <div class="sc-value">{{ deactivated_customers|default:"18" }}</div>
+      <div class="sc-value">{{ deactivated_customers|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> 3 this month</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">New This Month</span><div class="sc-icon purple"><i class="fas fa-user-plus"></i></div></div>
-      <div class="sc-value">{{ new_customers|default:"14" }}</div>
+      <div class="sc-value">{{ new_customers|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> vs 9 last month</div>
     </div>
   </div>
@@ -103,22 +103,22 @@
                 <div class="user-cell">
                   <div class="user-avatar blue">{{ c.first_name.0 }}{{ c.last_name.0 }}</div>
                   <div>
-                    <div class="user-name">{{ c.get_full_name }}</div>
-                    <div class="user-email">{{ c.email }}</div>
+                    <div class="user-name">{{ c.user.get_first_name }} {{ c.user.get_last_name }}</div>
+                    <div class="user-email">{{ c.user.email }}</div>
                   </div>
                 </div>
               </td>
-              <td class="text-sm">{{ c.phone|default:"—" }}</td>
-              <td style="font-weight:600;color:var(--text)">{{ c.order_count|default:"0" }}</td>
+              <td class="text-sm">{{ c.user.phone|default:"—" }}</td>
+              <td style="font-weight:600;color:var(--text)">{{ c.user.order_set.count|default:"0" }}</td>
               <td style="color:var(--accent);font-weight:600">${{ c.total_spent|default:"0" }}</td>
               <td>{{ c.fuel_preference|default:"—" }}</td>
               <td class="text-sm text-muted">{{ c.date_joined|date:"M d, Y" }}</td>
               <td><span class="badge badge-{{ c.is_active|yesno:'active,deactivated' }}"><i class="fas fa-circle"></i>{{ c.is_active|yesno:"Active,Deactivated" }}</span></td>
               <td>
                 <div class="action-group">
-                  <button class="btn btn-ghost btn-icon" title="Edit" onclick="openEditCustomerModal('{{ c.id }}','{{ c.get_full_name }}','{{ c.email }}','{{ c.phone }}')"><i class="fas fa-pen"></i></button>
-                  <button class="btn btn-warning btn-icon" title="{{ c.is_active|yesno:'Deactivate,Activate' }}" onclick="toggleCustomer('{{ c.id }}','{{ c.is_active|yesno:'deactivate,activate' }}')"><i class="fas fa-{{ c.is_active|yesno:'toggle-off,toggle-on' }}"></i></button>
-                  <button class="btn btn-danger btn-icon" title="Delete" onclick="openDeleteModal('Customer','{{ c.get_full_name }}','{% url 'delete_customer' c.id %}')"><i class="fas fa-trash"></i></button>
+                  <button class="btn btn-ghost btn-icon" title="Edit" onclick="openEditCustomerModal('{{ c.user.id }}','{{ c.user.get_first_name }} {{ c.user.get_last_name}}','{{ c.user.email }}','{{ c.user.phone }}')"><i class="fas fa-pen"></i></button>
+                  <button class="btn btn-warning btn-icon" title="{{ c.is_active|yesno:'Deactivate,Activate' }}" onclick="toggleCustomer('{{ c.user.id }}','{{ c.is_active|yesno:'deactivate,activate' }}')"><i class="fas fa-{{ c.is_active|yesno:'toggle-off,toggle-on' }}"></i></button>
+                  <button class="btn btn-danger btn-icon" title="Delete" onclick="openDeleteModal('Customer','{{ c.user.get_first_name }} {{ c.user.get_last_name }}','{% url 'delete_customer' c.user.id%}')"><i class="fas fa-trash"></i></button>
                 </div>
               </td>
             </tr>

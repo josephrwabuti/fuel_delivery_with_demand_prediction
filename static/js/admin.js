@@ -119,6 +119,5 @@ function openAssignModal(orderId) {
 
 function openDeleteModal(type, id) {
   document.getElementById("deleteTargetLabel").textContent = "Order #" + id;
-  document.getElementById("deleteForm").action = "admin/orders/delete" + id + "/";
-  openModal("deleteModal");
+  ddocument.getElementById("deleteForm").action = "/dashboard/admin/orders/delete/" + id + "/";
 }

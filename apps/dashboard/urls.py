@@ -13,7 +13,9 @@ urlpatterns = [
     path('admin/save-settings/', views.admin_save_settings, name='admin_save_settings'),
     path('admin/save-pricing/', views.admin_save_pricing, name='admin_save_pricing'),
     path("drivers/add/", views.add_driver, name="add_driver"),
-    
+    path('admin/orders/delete/<int:id>/', views.delete_order, name='delete_order'),
+    path('admin/customers/delete/<int:id>/', views.delete_customer, name='delete_customer'),
+    path('admin/drivers/delete/<int:id>/', views.delete_driver, name='delete_driver'),
     
     
 ]

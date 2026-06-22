@@ -34,22 +34,22 @@
   <div class="stats-grid mb-24">
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">All Orders</span><div class="sc-icon orange"><i class="fas fa-box-open"></i></div></div>
-      <div class="sc-value">{{ total_orders|default:"1,284" }}</div>
+      <div class="sc-value">{{ total_orders|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 48 this week</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Pending</span><div class="sc-icon yellow"><i class="fas fa-clock"></i></div></div>
-      <div class="sc-value">{{ pending_orders|default:"23" }}</div>
+      <div class="sc-value">{{ pending_orders|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> needs driver</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Delivered</span><div class="sc-icon green"><i class="fas fa-circle-check"></i></div></div>
-      <div class="sc-value">{{ delivered_orders|default:"873" }}</div>
+      <div class="sc-value">{{ delivered_orders|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 18 today</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Cancelled</span><div class="sc-icon red"><i class="fas fa-ban"></i></div></div>
-      <div class="sc-value">{{ cancelled_orders|default:"89" }}</div>
+      <div class="sc-value">{{ cancelled_orders|default_if_none:"0" }}</div>
       <div class="sc-change down"><i class="fas fa-arrow-down"></i> 3 this week</div>
     </div>
   </div>
@@ -102,7 +102,7 @@
         <tbody>
           {% if orders %}
             {% for o in orders %}
-            <tr data-status="{{ o.status }}" data-fuel="{{ o.fuel_type }}">
+            <tr data-id="{{ o.id }}" data-status="{{ o.status }}" data-fuel="{{ o.fuel_type }}" data-customer="{{ o.user.get_full_name }}" data-customer-email="{{ o.user.email }}" data-driver="{{ o.driver.get_full_name|default:'' }}" data-driver-html="{% if o.driver %}<div class='user-cell'><div class='user-avatar green'>{{ o.driver.first_name.0 }}{{ o.driver.last_name.0 }}</div><span class='text-sm'>{{ o.driver.get_full_name }}</span></div>{% else %}—{% endif %}">
               <td><span class="row-id">#{{ o.id }}</span></td>
               <td>
                 <div class="user-cell">
@@ -252,11 +252,24 @@
 <script src="{% static 'js/admin.js' %}"></script>
 <script>
   function openViewModal(orderId) {
-    document.getElementById('vmOrderId').textContent  = '#' + orderId;
-    document.getElementById('vmCustomer').textContent = 'Sarah Kim';
-    document.getElementById('vmDriver').textContent   = 'Carlos Rivera';
-    document.getElementById('vmFuel').textContent     = 'Petrol — 100L';
-    document.getElementById('vmStatus').innerHTML     = '<span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span>';
+    const row = document.querySelector(`#ordersTable tbody tr[data-id="${orderId}"]`);
+    if (!row) return;
+
+    const customer = row.dataset.customer || 'Unknown';
+    const customerEmail = row.dataset.customerEmail || '';
+    const driver = row.dataset.driver || '—';
+    const fuel = row.dataset.fuel || '—';
+    const status = row.dataset.status || 'Unknown';
+    const fuelText = fuel ? fuel + ' — ' + row.cells[3].textContent.split(' ')[1] : '—';
+
+    document.getElementById('vmOrderId').textContent = '#' + orderId;
+    document.getElementById('vmCustomer').innerHTML = customer + (customerEmail ? '<br/><span class="text-xs text-muted">' + customerEmail + '</span>' : '');
+    document.getElementById('vmDriver').textContent = driver;
+    document.getElementById('vmFuel').textContent = fuelText;
+    
+    const badgeClass = 'badge-' + status.toLowerCase().replace(/ /g, '-');
+    document.getElementById('vmStatus').innerHTML = '<span class="' + badgeClass + '"><i class="fas fa-circle"></i>' + status + '</span>';
+    
     document.getElementById('viewModal').classList.add('active');
   }
   
@@ -275,6 +288,25 @@
       row.style.display = (val === 'all' || row.dataset.fuel === val) ? '' : 'none';
     });
   }
+
+  function openAssignModal(orderId) {
+    document.getElementById('assignOrderId').textContent = '#' + orderId;
+    document.getElementById('assignForm').action = '/dashboard/orders/assign-driver/';
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'order_id';
+    input.value = orderId;
+    
+    const form = document.getElementById('assignForm');
+    const existingInput = form.querySelector('input[name="order_id"]');
+    if (existingInput) existingInput.remove();
+    form.appendChild(input);
+    
+    document.getElementById('assignModal').classList.add('active');
+}
+
+
 </script>
 </body>
 </html>

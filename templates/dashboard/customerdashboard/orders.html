@@ -143,7 +143,8 @@
       this.className = this.className.replace('btn-ghost','btn-primary');
       const filter = this.dataset.filter;
       document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
-        row.style.display = (filter === 'all' || row.dataset.status === filter) ? '' : 'none';
+        const status = row.dataset.status?.toLowerCase() || '';
+        row.style.display = (filter === 'all' || status === filter )? '': 'none'; 
       });
     });
   });

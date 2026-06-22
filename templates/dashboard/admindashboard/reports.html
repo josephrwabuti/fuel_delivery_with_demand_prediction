@@ -40,27 +40,27 @@
   <div class="stats-grid stats-grid-5 mb-24">
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Total Orders</span><div class="sc-icon orange"><i class="fas fa-box-open"></i></div></div>
-      <div class="sc-value">{{ total_orders|default:"1,284" }}</div>
+      <div class="sc-value">{{ total_orders|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 12% vs last year</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Delivered</span><div class="sc-icon green"><i class="fas fa-circle-check"></i></div></div>
-      <div class="sc-value">{{ delivered_orders|default:"873" }}</div>
+      <div class="sc-value">{{ delivered_orders|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> 68% of total</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Pending</span><div class="sc-icon yellow"><i class="fas fa-clock"></i></div></div>
-      <div class="sc-value">{{ pending_orders|default:"168" }}</div>
+      <div class="sc-value">{{ pending_orders|default_if_none:"0" }}</div>
       <div class="sc-change down"><i class="fas fa-arrow-down"></i> 5% vs last month</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Total Litres</span><div class="sc-icon purple"><i class="fas fa-gas-pump"></i></div></div>
-      <div class="sc-value">{{ total_litres|default:"284K" }}</div>
+      <div class="sc-value">{{ total_litres|default_if_none:"0L" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 8% vs last year</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Revenue</span><div class="sc-icon blue"><i class="fas fa-dollar-sign"></i></div></div>
-      <div class="sc-value">${{ total_revenue|default:"392K" }}</div>
+      <div class="sc-value">${{ total_revenue|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 14% vs last year</div>
     </div>
   </div>

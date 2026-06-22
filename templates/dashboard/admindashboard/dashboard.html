@@ -49,22 +49,22 @@
   <div class="stats-grid mb-24">
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Total Orders</span><div class="sc-icon orange"><i class="fas fa-box-open"></i></div></div>
-      <div class="sc-value">{{ total_orders|default:"1,284" }}</div>
+      <div class="sc-value">{{ total_orders|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 48 this week</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Pending Orders</span><div class="sc-icon yellow"><i class="fas fa-clock"></i></div></div>
-      <div class="sc-value">{{ pending_orders|default:"23" }}</div>
+      <div class="sc-value">{{ pending_orders|default:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> 5 unassigned</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Active Customers</span><div class="sc-icon blue"><i class="fas fa-users"></i></div></div>
-      <div class="sc-value">{{ total_customers|default:"512" }}</div>
+      <div class="sc-value">{{ total_customers|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 14 this month</div>
     </div>
     <div class="stat-card">
       <div class="sc-top"><span class="sc-label">Active Drivers</span><div class="sc-icon green"><i class="fas fa-truck-fast"></i></div></div>
-      <div class="sc-value">{{ total_drivers|default:"18" }}</div>
+      <div class="sc-value">{{ total_drivers|default_if_none:"0" }}</div>
       <div class="sc-change info"><i class="fas fa-circle"></i> 11 online now</div>
     </div>
   </div>
@@ -109,47 +109,10 @@
                 </tr>
                 {% endfor %}
               {% else %}
-              <!-- Demo rows -->
               <tr>
-                <td><span class="row-id">#FF-2048</span></td>
-                <td><div class="user-cell"><div class="user-avatar blue">HK</div><span>Harbour Logistics</span></div></td>
-                <td class="text-sm text-muted">—</td>
-                <td>Kerosene 80L</td>
-                <td class="text-sm text-muted">Jun 4</td>
-                <td><span class="badge badge-pending"><i class="fas fa-circle"></i>Pending</span></td>
+                <td colspan="6" class="text-center">No Orders Found. </td>
               </tr>
-              <tr>
-                <td><span class="row-id">#FF-2047</span></td>
-                <td><div class="user-cell"><div class="user-avatar green">MW</div><span>Marcus Webb</span></div></td>
-                <td class="text-sm text-muted">Carlos R.</td>
-                <td>Bio-Fuel 150L</td>
-                <td class="text-sm text-muted">Jun 4</td>
-                <td><span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span></td>
-              </tr>
-              <tr>
-                <td><span class="row-id">#FF-2046</span></td>
-                <td><div class="user-cell"><div class="user-avatar orange">AP</div><span>Anna Peters</span></div></td>
-                <td class="text-sm text-muted">James K.</td>
-                <td>Petrol 100L</td>
-                <td class="text-sm text-muted">Jun 3</td>
-                <td><span class="badge badge-processing"><i class="fas fa-circle"></i>Processing</span></td>
-              </tr>
-              <tr>
-                <td><span class="row-id">#FF-2045</span></td>
-                <td><div class="user-cell"><div class="user-avatar blue">RO</div><span>Robert Osei</span></div></td>
-                <td class="text-sm text-muted">Carlos R.</td>
-                <td>Diesel 300L</td>
-                <td class="text-sm text-muted">Jun 3</td>
-                <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
-              </tr>
-              <tr>
-                <td><span class="row-id">#FF-2044</span></td>
-                <td><div class="user-cell"><div class="user-avatar purple">SK</div><span>Sarah Kim</span></div></td>
-                <td class="text-sm text-muted">—</td>
-                <td>Petrol 100L</td>
-                <td class="text-sm text-muted">Jun 3</td>
-                <td><span class="badge badge-cancelled"><i class="fas fa-circle"></i>Cancelled</span></td>
-              </tr>
+             
               {% endif %}
             </tbody>
           </table>
@@ -189,10 +152,10 @@
             </svg>
           </div>
           <div class="donut-legend">
-            <div class="dl-row"><div class="dl-dot" style="background:#22c55e"></div><span class="dl-label">Delivered</span><span class="dl-val">{{ delivered_orders|default:"873" }}</span></div>
-            <div class="dl-row"><div class="dl-dot" style="background:#e85d04"></div><span class="dl-label">En Route</span><span class="dl-val">{{ enroute_orders|default:"154" }}</span></div>
-            <div class="dl-row"><div class="dl-dot" style="background:#f4a926"></div><span class="dl-label">Pending</span><span class="dl-val">{{ pending_orders|default:"168" }}</span></div>
-            <div class="dl-row"><div class="dl-dot" style="background:#ef4444"></div><span class="dl-label">Cancelled</span><span class="dl-val">{{ cancelled_orders|default:"89" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#22c55e"></div><span class="dl-label">Delivered</span><span class="dl-val">{{ delivered_orders|default_if_none:"0" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#e85d04"></div><span class="dl-label">En Route</span><span class="dl-val">{{ enroute_orders|default_if_none:"0" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#f4a926"></div><span class="dl-label">Pending</span><span class="dl-val">{{ pending_orders|default_if_none:"0" }}</span></div>
+            <div class="dl-row"><div class="dl-dot" style="background:#ef4444"></div><span class="dl-label">Cancelled</span><span class="dl-val">{{ cancelled_orders|default_if_none:"0" }}</span></div>
           </div>
         </div>
       </div>
@@ -226,44 +189,20 @@
         <a href="{% url 'admin_drivers' %}" class="btn btn-ghost btn-sm">View All</a>
       </div>
       <div class="card-body" style="padding:12px 22px">
-        {% for driver in top_drivers|default:"" %}
-        {% empty %}
-        <div class="driver-row">
-          <div class="user-avatar green">CR</div>
-          <div>
-            <div>Carlos Rivera</div>
-            <div>48 deliveries . 96% on-time</div>
+        {% if top_drivers %}
+          {% for driver in top_drivers %}
+          <div class="driver-row">
+            <div class="user-avatar green">{{ driver.initials }}</div>
+            <div>
+              <div>{{ driver.name }}</div>
+              <div>{{ driver.deliveries }} deliveries · {{ driver.on_time_rate }}% on-time</div>
+            </div>
+            <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">{{ driver.deliveries }}</div>
           </div>
-        </div>
-        <div class="driver-row">
-          <div class="user-avatar blue">JK</div>
-          <div>
-            <div>James Kiman</div>
-            <div>41 deliveries . 98% on-time</div>
-          </div>
-        </div>
-        <!-- Static fallback always shown -->
-        {% endfor %}
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <div class="user-avatar green" style="width:36px;height:36px;font-size:0.72rem">CR</div>
-          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">Carlos Rivera</div><div style="font-size:0.74rem;color:var(--text-muted)">48 deliveries · 96% on-time</div></div>
-          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">48</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <div class="user-avatar blue" style="width:36px;height:36px;font-size:0.72rem">JK</div>
-          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">James Kimani</div><div style="font-size:0.74rem;color:var(--text-muted)">41 deliveries · 98% on-time</div></div>
-          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">41</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <div class="user-avatar purple" style="width:36px;height:36px;font-size:0.72rem">PN</div>
-          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">Priya Nair</div><div style="font-size:0.74rem;color:var(--text-muted)">37 deliveries · 94% on-time</div></div>
-          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">37</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
-          <div class="user-avatar orange" style="width:36px;height:36px;font-size:0.72rem">TO</div>
-          <div style="flex:1"><div style="font-size:0.85rem;font-weight:600;color:var(--text)">Tom Okafor</div><div style="font-size:0.74rem;color:var(--text-muted)">33 deliveries · 97% on-time</div></div>
-          <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--success)">33</div>
-        </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center text-muted">No driver statistics yet.</div>
+        {% endif %}
       </div>
     </div>
 

@@ -75,15 +75,15 @@
         <span class="sc-label">Today's Deliveries</span>
         <div class="sc-icon blue"><i class="fas fa-truck-fast"></i></div>
       </div>
-      <div class="sc-value">{{ todays_deliveries|default:"3" }}</div>
-      <div class="sc-change info"><i class="fas fa-clock"></i> {{ todays_pending|default:"1" }} still active</div>
+      <div class="sc-value">{{ todays_deliveries|default_if_none:"0" }}</div>
+      <div class="sc-change info"><i class="fas fa-clock"></i> {{ todays_pending|default_if_none:"0" }} still active</div>
     </div>
     <div class="stat-card">
       <div class="sc-top">
         <span class="sc-label">Total Completed</span>
         <div class="sc-icon green"><i class="fas fa-circle-check"></i></div>
       </div>
-      <div class="sc-value">{{ total_completed|default:"148" }}</div>
+      <div class="sc-value">{{ total_completed|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 12 this week</div>
     </div>
     <div class="stat-card">
@@ -91,7 +91,7 @@
         <span class="sc-label">Litres Delivered</span>
         <div class="sc-icon orange"><i class="fas fa-gas-pump"></i></div>
       </div>
-      <div class="sc-value">{{ total_litres|default:"22.4K" }}</div>
+      <div class="sc-value">{{ total_litres|default_if_none:"0" }}</div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 1,840L this month</div>
     </div>
     <div class="stat-card">
@@ -99,7 +99,7 @@
         <span class="sc-label">On-Time Rate</span>
         <div class="sc-icon yellow"><i class="fas fa-star"></i></div>
       </div>
-      <div class="sc-value">{{ on_time_rate|default:"96" }}<span style="font-size:1.2rem">%</span></div>
+      <div class="sc-value">{{ on_time_rate|default_if_none:"0" }}<span style="font-size:1.2rem">%</span></div>
       <div class="sc-change up"><i class="fas fa-arrow-up"></i> 2% vs last month</div>
     </div>
   </div>
@@ -167,34 +167,11 @@
                 </tr>
                 {% endfor %}
               {% else %}
-              <!-- Demo rows -->
+              
               <tr>
-                <td><span class="del-id">#FF-2042</span></td>
-                <td><span class="fuel-pill"><i class="fas fa-gas-pump"></i>Diesel</span> 200L</td>
-                <td class="text-sm">James Mitchell</td>
-                <td class="text-muted text-sm">45 Main St, Downtown</td>
-                <td class="text-sm">8AM–12PM</td>
-                <td><span class="badge badge-delivered"><i class="fas fa-circle"></i>Delivered</span></td>
-                <td><a href="{% url 'delivery_detail' 1 %}" class="btn btn-ghost btn-sm"><i class="fas fa-arrow-right"></i></a></td>
-              </tr>
-              <tr>
-                <td><span class="del-id">#FF-2043</span></td>
-                <td><span class="fuel-pill"><i class="fas fa-fire-flame-curved"></i>Petrol</span> 100L</td>
-                <td class="text-sm">Sarah Kim</td>
-                <td class="text-muted text-sm">12 Park Ave, Westside</td>
-                <td class="text-sm">12PM–5PM</td>
-                <td><span class="badge badge-en-route"><i class="fas fa-circle"></i>En Route</span></td>
-                <td><a href="{% url 'delivery_detail' 2 %}" class="btn btn-driver btn-sm"><i class="fas fa-arrows-rotate"></i> Update</a></td>
-              </tr>
-              <tr>
-                <td><span class="del-id">#FF-2044</span></td>
-                <td><span class="fuel-pill"><i class="fas fa-leaf"></i>Bio-Fuel</span> 150L</td>
-                <td class="text-sm">Robert Osei</td>
-                <td class="text-muted text-sm">8 Commerce Rd</td>
-                <td class="text-sm">5PM–8PM</td>
-                <td><span class="badge badge-pending"><i class="fas fa-circle"></i>Pending</span></td>
-                <td><a href="{% url 'delivery_detail' 3 %}" class="btn btn-ghost btn-sm"><i class="fas fa-arrow-right"></i></a></td>
-              </tr>
+                <td colspan="7" class="text-center">No assignments for today </td>
+              </td>
+              
               {% endif %}
             </tbody>
           </table>
